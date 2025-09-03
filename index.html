@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Tailwind -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- <link rel="stylesheet" href="./src/output.css"> -->
+    <!-- Remixicon -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+    <title>RentalKu</title>
+</head>
+<style>
+    *{
+        /* outline: 1px solid red; */
+    }
+</style>
+
+<body class="bg-[#121212] w-screen">
+    <header class="h-[60px] w-full flex items-center justify-between px-10 fixed z-10 backdrop-blur-[7px] bg-black/20">
+        <!-- Logo -->
+        <div class="kiri flex w-[70%]">
+            <div class="logo">
+                <a href="index.php">
+                    <img src="/shokatv/public/assets/images/ShokaTv.png" alt="logo"
+                        class="h-[50px] w-auto px-2">
+                </a>
+            </div>
+    
+            <!-- Navbar -->
+            <nav class="relative w-[65%] ">
+                <ul class="relative flex gap-x-6 h-full text-black font-bold text-[18px] w-full px-6 py-2">
+                    <li><a href="#" class="active">Dashboard</a></li>
+                    <li><a href="#">List Mobil</a></li>
+                    <li><a href="#">Rental</a></li>
+                    <!-- underline -->
+                    <span
+                        class="underline absolute bottom-1 h-[3px] bg-blue-600 rounded transition-all duration-400 ease-in-out"
+                        style="width:0; left:0; top: 37px;"></span>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="kanan flex items-end justify-items-end w-[30%]">
+            <!-- Actions -->
+            <div class="navbar-actions flex items-center gap-8">
+                <div class="box flex w-15 cursor-pointer">
+                    Sign In
+                </div>
+                <div class="box flex w-15 cursor-pointer">
+                    Log In
+                </div>
+            </div>
+        </div>
+
+    </header>
+
+    <main>
+  <div class="dashboard-container h-screen bg-[#ccc] flex items-center justify-between px-10">
+    
+    <!-- Title & Description -->
+    <div class="dashboard-title max-w-lg">
+      <div class="dashboard-header mb-4">
+        <h1 class="text-[48px] font-bold">Rental Mobil Premium</h1>
+        <h2 class="text-[32px] text-gray-600 font-bold">Mudah dan cepat</h2>
+        <hr class="my-2 border-gray-300">
+      </div>
+
+      <p class="desc text-gray-700">
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
+        Doloremque quis veniam temporibus accusantium fugit enim 
+        architecto sit dolorum eos, dolore similique vitae soluta 
+        minus recusandae tempora cupiditate quidem magnam sunt.
+      </p>
+    </div>
+    
+    <!-- Dashboard Image -->
+    <div class="dashboard-img relative">
+      <img src="dashboard.png" alt="Ilustrasi Rental Mobil" class="h-[450px] w-auto object-contain">
+    </div>
+
+  </div>
+  <!-- Gradasi -->
+        <div class="gradasi">
+            
+        </div>
+        <div class="rental-container h-screen">
+
+        </div>
+    </main>
+
+    <script>
+       const nav = document.querySelector("nav");
+        const underline = document.querySelector(".underline");
+        const links = nav.querySelectorAll("a");
+
+        function moveUnderline(el) {
+            underline.style.width = `${el.offsetWidth}px`;
+            underline.style.left = `${el.offsetLeft}px`;
+        }
+
+        // aktif pertama kali (Home)
+        const active = nav.querySelector(".active");
+        if (active) moveUnderline(active);
+
+        // hover & click
+        links.forEach(link => {
+            link.addEventListener("mouseenter", e => moveUnderline(e.target));
+            link.addEventListener("mouseleave", () => {
+                const currentActive = nav.querySelector(".active");
+                if (currentActive) moveUnderline(currentActive);
+            });
+            link.addEventListener("click", e => {
+                e.preventDefault();
+                links.forEach(l => l.classList.remove("active"));
+                e.target.classList.add("active");
+                moveUnderline(e.target);
+            });
+        });
+    </script>
+</body>
+
+</html>
