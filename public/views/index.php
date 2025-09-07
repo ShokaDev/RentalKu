@@ -2,7 +2,7 @@
 session_start();
 // Contoh login sederhana (buat demo aja)
 if (!isset($_SESSION['user'])) {
-    $_SESSION['user'] = "Faharel"; // Contoh kalau sudah login
+    // $_SESSION['user'] = "Faharel"; // Contoh kalau sudah login
 }
 ?>
 <!DOCTYPE html>
@@ -57,7 +57,7 @@ if (!isset($_SESSION['user'])) {
                     <a href="signup.php" class="px-4 py-2 cursor-pointer hover:underline transition font-medium">
                         Sign In
                     </a>
-                    <a href="login.php" class="bg-blue-500 text-white px-4 py-2 rounded-3xl cursor-pointer font-semibold hover:bg-blue-600 transition">
+                    <a href="../index.php" class="bg-blue-500 text-white px-4 py-2 rounded-3xl cursor-pointer font-semibold hover:bg-blue-600 transition">
                         Log In
                     </a>
                 </div>
