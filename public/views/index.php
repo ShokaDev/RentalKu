@@ -64,8 +64,8 @@ if (!isset($_SESSION['user'])) {
             <?php else: ?>
                 <!-- Jika sudah login -->
                 <div class="flex items-center gap-4 h-full w-full justify-end">
-                    <span class="font-medium">Halo, <?php echo $_SESSION['user']; ?> 👋</span>
-                    <a href="logout.php" class="bg-red-500 text-white px-4 py-2 rounded-3xl cursor-pointer font-semibold hover:bg-red-600 transition">
+                    <span class="font-medium">Halo, <?php echo $_SESSION['username']; ?> 👋</span>
+                    <a href="../../php/logout.php" class="bg-red-500 text-white px-4 py-2 rounded-3xl cursor-pointer font-semibold hover:bg-red-600 transition">
                         Logout
                     </a>
                 </div>

@@ -20,7 +20,7 @@ if (isset($_POST['login'])) {
     $_SESSION['username'] = $user['username'];
     $_SESSION['role'] = $user['role'];
 
-    header("Location: ../views/dashboard.php");
+    header("Location: ../public/views/index.php");
     } else {
         echo "<script>alert('Login gagal! Username atau password salah.'); window.location.href='../public/login.php';</script>";
     }
