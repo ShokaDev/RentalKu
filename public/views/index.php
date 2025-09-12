@@ -31,7 +31,7 @@ if (!isset($_SESSION['user'])) {
         <div class="kiri flex items-center w-[70%]">
             <div class="logo">
                 <a href="index.php">
-                    <img src="logo-sementara.jpg" alt="logo" class="h-[50px] w-auto px-2">
+                    <img src="../../logo-sementara.jpg" alt="logo" class="h-[50px] w-auto px-2">
                 </a>
             </div>
 
@@ -94,35 +94,58 @@ if (!isset($_SESSION['user'])) {
 
             <!-- Dashboard Image -->
             <div class="dashboard-img relative mt-6 md:mt-0">
-                <img src="dashboard.png" alt="Ilustrasi Rental Mobil" class="h-[350px] md:h-[450px] w-auto object-contain">
+                <img src="../../dashboard.png" alt="Ilustrasi Rental Mobil" class="h-[350px] md:h-[450px] w-auto object-contain">
             </div>
         </div>
 
         <!-- List Mobil -->
         <section id="list-mobil" class="py-16 px-10 bg-white">
-            <h2 class="text-3xl font-bold mb-8">List Mobil</h2>
+            <h2 class="text-3xl font-bold mb-8">List Kendaraan</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Card mobil -->
-                <div class="bg-gray-100 p-4 rounded-xl shadow hover:shadow-lg transition">
-                    <img src="BojongLali.jpg" alt="Mobil 1" class="w-full h-[200px] object-cover rounded-lg mb-4">
-                    <h3 class="text-xl font-semibold">Toyota Avanza</h3>
-                    <p class="text-gray-600">Rp 300.000 / hari</p>
-                    <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Sewa Sekarang</button>
-                </div>
-                <div class="bg-gray-100 p-4 rounded-xl shadow hover:shadow-lg transition">
-                    <img src="BojongLali.jpg" alt="Mobil 2" class="w-full h-[200px] object-cover rounded-lg mb-4">
-                    <h3 class="text-xl font-semibold">Honda Brio</h3>
-                    <p class="text-gray-600">Rp 250.000 / hari</p>
-                    <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Sewa Sekarang</button>
-                </div>
-                <div class="bg-gray-100 p-4 rounded-xl shadow hover:shadow-lg transition">
-                    <img src="BojongLali.jpg" alt="Mobil 3" class="w-full h-[200px] object-cover rounded-lg mb-4">
-                    <h3 class="text-xl font-semibold">Mitsubishi Pajero</h3>
-                    <p class="text-gray-600">Rp 600.000 / hari</p>
-                    <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Sewa Sekarang</button>
-                </div>
+                <?php
+                include("../../config/koneksi.php");
+                // Ambil semua kendaraan
+                $result = mysqli_query($conn, "SELECT * FROM kendaraan");
+
+                if (mysqli_num_rows($result) > 0):
+                    while ($row = mysqli_fetch_assoc($result)):
+                ?>
+                    <div class="bg-gray-100 p-4 rounded-xl shadow hover:shadow-lg transition">
+                        <!-- Gambar default (karena tabel belum ada kolom gambar) -->
+                        <img src="<?= htmlspecialchars($row['gambar']) ?>"
+                            alt="<?= htmlspecialchars($row['merk'].' '.$row['tipe']) ?>"
+                            class="w-full h-[200px] object-cover rounded-lg mb-4">
+
+
+                        <h3 class="text-xl font-semibold">
+                            <?= htmlspecialchars($row['merk'].' '.$row['tipe']) ?> (<?= $row['tahun'] ?>)
+                        </h3>
+                        <p class="text-gray-600">Rp <?= number_format($row['harga_sewa'], 0, ',', '.') ?> / hari</p>
+                        <p class="text-sm text-gray-500">No. Plat: <?= htmlspecialchars($row['no_plat']) ?></p>
+
+                        <?php if ($row['status'] === 'tersedia'): ?>
+                            <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                                Sewa Sekarang
+                            </button>
+                        <?php elseif ($row['status'] === 'disewa'): ?>
+                            <button class="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg cursor-not-allowed" disabled>
+                                Sedang Disewa
+                            </button>
+                        <?php else: ?>
+                            <button class="mt-4 bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed" disabled>
+                                Perbaikan
+                            </button>
+                        <?php endif; ?>
+                    </div>
+                <?php 
+                    endwhile;
+                else: 
+                ?>
+                    <p class="col-span-3 text-center text-gray-500">Belum ada data kendaraan tersedia.</p>
+                <?php endif; ?>
             </div>
-        </section>
+</section>
+
 
         <!-- Rental -->
         <section id="rental" class="py-16 px-10 bg-[#f9fafb]">
