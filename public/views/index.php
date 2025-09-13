@@ -57,7 +57,7 @@ if (!isset($_SESSION['user'])) {
                     <a href="signup.php" class="px-4 py-2 cursor-pointer hover:underline transition font-medium">
                         Sign In
                     </a>
-                    <a href="../index.php" class="bg-blue-500 text-white px-4 py-2 rounded-3xl cursor-pointer font-semibold hover:bg-blue-600 transition">
+                    <a href="../login.php" class="bg-blue-500 text-white px-4 py-2 rounded-3xl cursor-pointer font-semibold hover:bg-blue-600 transition">
                         Log In
                     </a>
                 </div>
@@ -100,7 +100,7 @@ if (!isset($_SESSION['user'])) {
 
         <!-- List Mobil -->
         <section id="list-mobil" class="py-16 px-10 bg-white">
-            <h2 class="text-3xl font-bold mb-8">List Kendaraan</h2>
+            <h2 class="text-3xl font-bold mb-8 text-center">List Kendaraan</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <?php
                 include("../../config/koneksi.php");
@@ -149,7 +149,7 @@ if (!isset($_SESSION['user'])) {
 
         <!-- Rental -->
         <section id="rental" class="py-16 px-10 bg-[#f9fafb]">
-            <h2 class="text-3xl font-bold mb-8">Form Rental</h2>
+            <h2 class="text-3xl font-bold mb-8 text-center">Form Rental</h2>
             <form action="proses_rental.php" method="post" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block mb-2 font-medium">Nama Lengkap</label>
