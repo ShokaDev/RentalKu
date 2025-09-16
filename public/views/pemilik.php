@@ -38,13 +38,13 @@ if (!isset($_SESSION['user'])) {
             <!-- Navbar -->
             <nav class="relative w-[65%]">
                 <ul class="relative flex gap-x-6 h-full text-black font-semibold text-[18px] w-full px-6 py-2">
-                    <li><a href="#" class="active">Dashboard</a></li>
-                    <li><a href="#list-mobil">List Mobil</a></li>
-                    <li><a href="#rental">Rental</a></li>
+                    <li><a href="index.php" class="active">Home</a></li>
+                    <li><a href="kendaraan.php">Kendaraan</a></li>
+                    <li><a href="pemilik.php">Mitra</a></li>
                     <!-- underline -->
-                    <span
+                    <!-- <span
                         class="underline absolute bottom-1 h-[3px] bg-blue-600 rounded transition-all duration-400 ease-in-out"
-                        style="width:0; left:0; top: 37px;"></span>
+                        style="width:0; left:0; top: 37px;"></span> -->
                 </ul>
             </nav>
         </div>
@@ -74,21 +74,23 @@ if (!isset($_SESSION['user'])) {
     </header>
 
     <!-- Main -->
-    <main>
-        <!-- Dashboard -->
-        <div class="dashboard-container h-screen bg-[#f1f4f8] flex flex-col md:flex-row items-center justify-between px-10 pt-[60px]">
-            <section class="py-10 px-8">
-                <h2 class="text-2xl font-bold mb-6">Data Pemilik / Agen</h2>
-                <table class="w-full border border-gray-300">
-                    <thead class="bg-gray-200">
+    <main class="pt-[60px] px-10 bg-[#f1f4f8] min-h-screen">
+        <section class="py-10 px-8 bg-white rounded-2xl shadow-md">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-3">
+                Data Pemilik / Agen
+            </h2>
+
+            <div class="overflow-x-auto">
+                <table class="w-full border border-gray-200 rounded-lg overflow-hidden">
+                    <thead class="bg-blue-600 text-white">
                         <tr>
-                            <th class="p-2">No</th>
-                            <th class="p-2">Nama Pemilik</th>
-                            <th class="p-2">Alamat</th>
-                            <th class="p-2">No HP</th>
-                            <th class="p-2">No KTP</th>
-                            <th class="p-2">Keterangan</th>
-                            <th class="p-2">Aksi</th>
+                            <th class="p-3 text-left">No</th>
+                            <th class="p-3 text-left">Nama Pemilik</th>
+                            <th class="p-3 text-left">Alamat</th>
+                            <th class="p-3 text-left">No HP</th>
+                            <th class="p-3 text-left">No KTP</th>
+                            <th class="p-3 text-left">Keterangan</th>
+                            <th class="p-3 text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -97,28 +99,32 @@ if (!isset($_SESSION['user'])) {
                         $result = mysqli_query($conn, "SELECT * FROM pemilik");
                         $no = 1;
                         while ($row = mysqli_fetch_assoc($result)) {
-                            echo "<tr>
-                        <td class='p-2 border'>$no</td>
-                        <td class='p-2 border'>{$row['nama_pemilik']}</td>
-                        <td class='p-2 border'>{$row['alamat']}</td>
-                        <td class='p-2 border'>{$row['no_hp']}</td>
-                        <td class='p-2 border'>{$row['no_ktp']}</td>
-                        <td class='p-2 border'>{$row['keterangan']}</td>
-                        <td class='p-2 border'>
-                            <button class='bg-blue-500 text-white px-3 py-1 rounded'>Edit</button>
-                            <button class='bg-red-500 text-white px-3 py-1 rounded'>Hapus</button>
-                        </td>
-                      </tr>";
+                            echo "
+                        <tr class='odd:bg-white even:bg-gray-50 hover:bg-gray-100 transition'>
+                            <td class='p-3 border'>$no</td>
+                            <td class='p-3 border font-medium text-gray-800'>{$row['nama_pemilik']}</td>
+                            <td class='p-3 border'>{$row['alamat']}</td>
+                            <td class='p-3 border'>{$row['no_hp']}</td>
+                            <td class='p-3 border'>{$row['no_ktp']}</td>
+                            <td class='p-3 border text-sm text-gray-600'>{$row['keterangan']}</td>
+                            <td class='p-3 border text-center'>
+                                <button class='bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-sm font-semibold transition'>
+                                    Edit
+                                </button>
+                                <button class='bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm font-semibold transition ml-2'>
+                                    Hapus
+                                </button>
+                            </td>
+                        </tr>";
                             $no++;
                         }
                         ?>
                     </tbody>
                 </table>
-            </section>
-
-
-        </div>
+            </div>
+        </section>
     </main>
+
 
     <script>
         const nav = document.querySelector("nav");

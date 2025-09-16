@@ -1,9 +1,27 @@
 <?php
 session_start();
-// Contoh login sederhana (buat demo aja)
-if (!isset($_SESSION['user'])) {
-    // $_SESSION['user'] = "Faharel"; // Contoh kalau sudah login
+include("../../config/koneksi.php");
+
+// Tentukan filter
+$filter = isset($_GET['filter']) ? $_GET['filter'] : 'tersedia';
+
+// Query ambil data kendaraan + pemilik + penyewa (kalau ada)
+$query = "
+    SELECT k.*, 
+           p.nama_pemilik, 
+           pl.nama AS nama_penyewa
+    FROM kendaraan k
+    JOIN pemilik p ON k.id_pemilik = p.id_pemilik
+    LEFT JOIN sewa s ON k.id_kendaraan = s.id_kendaraan AND s.status = 'aktif'
+    LEFT JOIN pelanggan pl ON s.id_pelanggan = pl.id_pelanggan
+";
+
+// Tambahkan filter jika bukan "all"
+if ($filter !== 'all') {
+    $query .= " WHERE k.status = '$filter'";
 }
+
+$result = mysqli_query($conn, $query);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,13 +34,12 @@ if (!isset($_SESSION['user'])) {
     <!-- Remixicon -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
     <title>RentalKu</title>
+    <style>
+        * {
+            font-family: Arial, sans-serif;
+        }
+    </style>
 </head>
-
-<style>
-    * {
-        font-family: Arial, sans-serif;
-    }
-</style>
 
 <body class="bg-[#fff] overflow-x-hidden w-screen">
     <!-- Header -->
@@ -38,13 +55,9 @@ if (!isset($_SESSION['user'])) {
             <!-- Navbar -->
             <nav class="relative w-[65%]">
                 <ul class="relative flex gap-x-6 h-full text-black font-semibold text-[18px] w-full px-6 py-2">
-                    <li><a href="#" class="active">Dashboard</a></li>
-                    <li><a href="#list-mobil">List Mobil</a></li>
-                    <li><a href="#rental">Rental</a></li>
-                    <!-- underline -->
-                    <span
-                        class="underline absolute bottom-1 h-[3px] bg-blue-600 rounded transition-all duration-400 ease-in-out"
-                        style="width:0; left:0; top: 37px;"></span>
+                    <li><a href="index.php" class="active">Home</a></li>
+                    <li><a href="kendaraan.php">Kendaraan</a></li>
+                    <li><a href="pemilik.php">Mitra</a></li>
                 </ul>
             </nav>
         </div>
@@ -76,69 +89,123 @@ if (!isset($_SESSION['user'])) {
     <!-- Main -->
     <main>
         <!-- Dashboard -->
-        <div class="dashboard-container h-screen bg-[#f1f4f8] flex flex-col md:flex-row items-center justify-between px-10 pt-[60px]">
-            <!-- Title & Description -->
-            <section class="py-10 px-8">
-                <h2 class="text-2xl font-bold mb-6">Data Kendaraan</h2>
+        <div class="dashboard-container min-h-screen bg-[#f1f4f8] flex flex-col px-10 pt-[80px]">
+            <!-- Title -->
+            <section class="py-10 px-8 w-full">
+                <h2 class="text-3xl font-bold mb-8 text-center">LIST KENDARAAN</h2>
+
+                <!-- Filter -->
+                <div class="user-filter flex items-center justify-between mb-6">
+                    <ul class="flex space-x-4">
+                        <li>
+                            <a href="?filter=tersedia"
+                                class="px-4 py-2 rounded-lg font-medium 
+                                    <?php echo ($filter === 'tersedia') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'; ?>">
+                                Tersedia
+                            </a>
+                        </li>
+                        <li>
+                            <a href="?filter=disewa"
+                                class="px-4 py-2 rounded-lg font-medium 
+                                    <?php echo ($filter === 'disewa') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'; ?>">
+                                Disewa
+                            </a>
+                        </li>
+                        <li>
+                            <a href="?filter=perbaikan"
+                                class="px-4 py-2 rounded-lg font-medium 
+                                    <?php echo ($filter === 'perbaikan') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'; ?>">
+                                Perbaikan
+                            </a>
+                        </li>
+                        <li>
+                            <a href="?filter=all"
+                                class="px-4 py-2 rounded-lg font-medium 
+                                    <?php echo ($filter === 'all') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'; ?>">
+                                Semua Kendaraan
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Tambah kendaraan hanya untuk admin -->
+                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') : ?>
+                        <a href="tambah_kendaraan.php"
+                            class="ml-4 bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg font-semibold transition">
+                            + Tambah Kendaraan
+                        </a>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Grid Kendaraan -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <?php
-                    include("../../config/koneksi.php");
-                    $result = mysqli_query($conn, "SELECT k.*, p.nama_pemilik FROM kendaraan k 
-                                        LEFT JOIN pemilik p ON k.id_pemilik = p.id_pemilik");
-                    while ($row = mysqli_fetch_assoc($result)) {
-                    ?>
-                        <div class="bg-gray-100 p-4 rounded-xl shadow hover:shadow-lg transition">
-                            <img src="<?= htmlspecialchars($row['gambar']) ?>"
-                                alt="<?= htmlspecialchars($row['merk'] . ' ' . $row['tipe']) ?>"
-                                class="w-full h-[200px] object-cover rounded-lg mb-4">
-                            <h3 class="text-xl font-semibold"><?= $row['merk'] . ' ' . $row['tipe'] ?> (<?= $row['tahun'] ?>)</h3>
-                            <p class="text-gray-600">Rp <?= number_format($row['harga_sewa'], 0, ',', '.') ?> / hari</p>
-                            <p class="text-sm text-gray-500">Pemilik: <?= $row['nama_pemilik'] ?? '-' ?></p>
-                            <p class="text-sm text-gray-500">No Plat: <?= $row['no_plat'] ?></p>
-                            <?php if ($row['status'] === 'tersedia'): ?>
-                                <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg">Sewa Sekarang</button>
-                            <?php elseif ($row['status'] === 'disewa'): ?>
-                                <button class="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg" disabled>Sedang Disewa</button>
-                            <?php else: ?>
-                                <button class="mt-4 bg-gray-400 text-white px-4 py-2 rounded-lg" disabled>Perbaikan</button>
-                            <?php endif; ?>
-                        </div>
-                    <?php } ?>
+                    <?php if (mysqli_num_rows($result) > 0): ?>
+                        <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                            <div class="bg-white rounded-2xl shadow hover:shadow-lg transition relative overflow-hidden">
+                                <!-- Status Badge -->
+                                <?php if ($row['status'] === 'tersedia'): ?>
+                                    <span class="absolute top-3 left-3 bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                                        Tersedia
+                                    </span>
+                                <?php elseif ($row['status'] === 'disewa'): ?>
+                                    <span class="absolute top-3 left-3 bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                                        Disewa
+                                    </span>
+                                <?php else: ?>
+                                    <span class="absolute top-3 left-3 bg-gray-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                                        Maintenance
+                                    </span>
+                                <?php endif; ?>
+
+                                <!-- Price Tag -->
+                                <span class="absolute bottom-47 right-3 bg-black/70 text-white text-sm font-bold px-4 py-2 rounded-lg">
+                                    Rp <?= number_format($row['harga_sewa'], 0, ',', '.') ?> / Hari
+                                </span>
+
+                                <!-- Image -->
+                                <img src="<?= htmlspecialchars($row['gambar']) ?>"
+                                    alt="<?= htmlspecialchars($row['merk'] . ' ' . $row['tipe']) ?>"
+                                    class="w-full h-52 object-cover rounded-t-2xl">
+
+                                <!-- Content -->
+                                <div class="p-5">
+                                    <h3 class="text-lg font-semibold"><?= $row['merk'] . ' ' . $row['tipe'] ?></h3>
+                                    <p class="text-sm text-gray-500"><?= $row['tahun'] ?> • <?= strtoupper($row['no_plat']) ?></p>
+
+                                    <!-- Owner -->
+                                    <p class="text-sm mt-2"><strong>Owner:</strong> <?= htmlspecialchars($row['nama_pemilik']) ?></p>
+
+                                    <!-- Penyewa -->
+                                    <?php if ($row['status'] === 'disewa' && $row['nama_penyewa']): ?>
+                                        <p class="text-sm text-red-600"><strong>Rented by:</strong> <?= htmlspecialchars($row['nama_penyewa']) ?></p>
+                                    <?php endif; ?>
+
+                                    <!-- Action -->
+                                    <?php if ($row['status'] === 'tersedia'): ?>
+                                        <?php if (!isset($_SESSION['user'])): ?>
+                                            <a href="../login.php"
+                                                class="mt-5 block w-full bg-yellow-500 text-white py-2 rounded-xl font-semibold text-center hover:bg-yellow-600">
+                                                Login untuk Rental
+                                            </a>
+                                        <?php else: ?>
+                                            <a href="form_rental.php?id_kendaraan=<?= $row['id_kendaraan'] ?>"
+                                                class="mt-5 block w-full bg-blue-600 text-white py-2 rounded-xl font-semibold text-center hover:bg-blue-700">
+                                                Rental Sekarang
+                                            </a>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        <button class="mt-5 w-full bg-gray-400 text-white py-2 rounded-xl font-semibold cursor-not-allowed" disabled>
+                                            Tidak Tersedia
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <p class="col-span-3 text-center text-gray-500">Tidak ada kendaraan.</p>
+                    <?php endif; ?>
                 </div>
             </section>
-
         </div>
     </main>
-
-    <script>
-        const nav = document.querySelector("nav");
-        const underline = document.querySelector(".underline");
-        const links = nav.querySelectorAll("a");
-
-        function moveUnderline(el) {
-            underline.style.width = `${el.offsetWidth}px`;
-            underline.style.left = `${el.offsetLeft}px`;
-        }
-
-        // aktif pertama kali (Dashboard)
-        const active = nav.querySelector(".active");
-        if (active) moveUnderline(active);
-
-        // hover & click
-        links.forEach(link => {
-            link.addEventListener("mouseenter", e => moveUnderline(e.target));
-            link.addEventListener("mouseleave", () => {
-                const currentActive = nav.querySelector(".active");
-                if (currentActive) moveUnderline(currentActive);
-            });
-            link.addEventListener("click", e => {
-                e.preventDefault();
-                links.forEach(l => l.classList.remove("active"));
-                e.target.classList.add("active");
-                moveUnderline(e.target);
-            });
-        });
-    </script>
 </body>
-
 </html>

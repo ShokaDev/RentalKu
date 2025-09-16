@@ -6,20 +6,14 @@
     box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
 }
-
-/* :root{
-    --background{}
-} */
 body {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    /* background: url('background.jpg') no-repeat; */
+    background: url('background.jpg') no-repeat;
     background-size: cover;
     background-position: center;
-    /* background-color: #fafbfb; */
-    /* background-color: red; */
 }
 
 header{
@@ -86,15 +80,14 @@ header{
 
 .navigation .btnLogin-popup:hover{
     background: #fff;
-    color: #131314;
+    color: #162938;
 }
 
 .wrapper{
     position: relative;
     width: 400px;
     height: 440px;
-    background-color: #fefffe;
-    /* background: transparent; */
+    background: transparent;
     border: 2px solid rgba(255, 255, 255, .5);
     border-radius: 20px;
     backdrop-filter: blur(20px);
@@ -149,7 +142,7 @@ header{
     right: 0;
     width: 45px;
     height: 45px;
-    background: #131314;
+    background: #162938;
     font-size: 2em;
     color: #fff;
     display: flex;
@@ -162,7 +155,7 @@ header{
 
 .form-box h2{
     font-size: 2em;
-    color: #131314;
+    color: #162938;
     text-align: center;
 }
 
@@ -170,25 +163,8 @@ header{
     position: relative;
     width: 100%;
     height: 50px;
-    border-bottom: 2px solid #131314;
+    border-bottom: 2px solid #162938;
     margin: 30px 0;
-}
-
-.input-box select {
-    width: 100%;
-    height: 50px;
-    background: transparent;
-    border: none;
-    outline: none;
-    /* border-bottom: 2px solid #ccc; */
-    color: #000;
-    font-size: 16px;
-    padding: 0 35px 0 5px;
-    appearance: none;
-}
-
-.input-box select:focus {
-    border-bottom-color: #fff;
 }
 
 .input-box label{
@@ -197,7 +173,7 @@ header{
     left: 5px;
     transform: translateY(-50%);
     font-size: 1em;
-    color: #131314;
+    color: #162938;
     font-weight: 500;
     pointer-events: none;
     transition: .5s;
@@ -215,58 +191,43 @@ header{
     border: none;
     outline: none;
     font-size: 1em;
-    color: #131314;
+    color: #162938;
     font-weight: 600;
     padding: 0 35px 0 5px;
 }
+
+.input-box select {
+    width: 100%;
+    padding: 10px 35px 10px 10px;
+    border: none;
+    border-bottom: 2px solid #000;
+    background: transparent;
+    outline: none;
+    font-size: 16px;
+    color: #333;
+    appearance: none; /* Hilangin default arrow */
+}
+
+.input-box select:focus {
+    border-bottom: 2px solid #007bff;
+}
+
+.input-box select option {
+    color: #000;
+}
+
 
 .input-box .icon{
     position: absolute;
     right: 8px;
     font-size: 1.2em;
-    color: #131314;
+    color: #162938;
     line-height: 57px;
-}
-
-.select-box{
-    position: relative;
-    margin-bottom: 20px;
-}
-
-.select-box select {
-    width: 100%;
-    /* padding: 12px 10px;*/
-    font-size: 16px;
-    font-weight: 600;
-    border: none;
-    border-bottom: 2px solid #1e2a38;
-    background: transparent;
-    appearance: none;   
-    color: #1e2a38;
-    cursor: pointer;
-}
-
-.select-box label {
-    position: absolute;
-    /* left: 10px; */
-    /* top: 12px; */
-    color: #1e2a38;
-    pointer-events: none;
-    transition: .5s ease;
-    background: white;
-    /* padding: 0 5px; */
-}
-
-.select-box select:valid + label,
-.select-box select:focus + label {
-    top: -5px;
-    /* font-size: 12px; */
-    color: #1e2a38;
 }
 
 .remember-forgot{
     font-size: .9em;
-    color: #131314;
+    color: #162938;
     font-weight: 500;
     margin: -15px 0 15px;
     display: flex;
@@ -274,13 +235,12 @@ header{
 }
 
 .remember-forgot label input{
-    accent-color: #131314;
+    accent-color: #162938;
     margin-right: 3px;
 }
 
 .remember-forgot a{
-    color: #131314;
-    background-color: bei;
+    color: #162938;
     text-decoration: none;
 }
 
@@ -291,7 +251,7 @@ header{
 .btn{
     width: 100%;
     height: 45px;
-    background: #131314;
+    background: #162938;
     border: none;
     outline: none;
     border-radius: 6px;
@@ -303,14 +263,14 @@ header{
 
 .login-register{
     font-size: .9em;
-    color: #131314;
+    color: #162938;
     text-align: center;
     font-weight: 500;
     margin: 25px 0 10px;
 }
 
 .login-register p a{
-    color: #131314;
+    color: #162938;
     text-decoration: none;
     font-weight: 600;
 }
@@ -318,3 +278,4 @@ header{
 .login-register p a:hover{
     text-decoration: underline;
 }
+
