@@ -1,5 +1,16 @@
 <?php
-include("../config/koneksi.php");
+session_start();
+if (isset($_SESSION['user_id'])) {
+    // Kalau sudah login, langsung lempar ke dashboard sesuai role
+    if ($_SESSION['role'] === 'admin') {
+        header("Location: views/dashboard_admin.php");
+    } elseif ($_SESSION['role'] === 'agen') {
+        header("Location: views/dashboard_agen.php");
+    } elseif ($_SESSION['role'] === 'pelanggan') {
+        header("Location: views/dashboard_pelanggan.php");
+    }
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -7,153 +18,46 @@ include("../config/koneksi.php");
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login / Register</title>
-    <link rel="stylesheet" href="../src/css/login.css">
+    <title>Login - RentalKu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-    <div class="wrapper active-popup">
-        <!-- <span class="icon-close"><ion-icon name="close"></ion-icon></span> -->
-
-        <!-- Login Form -->
-        <div class="form-box login">
-            <h2>Login</h2>
-            <form action="../php/auth.php" method="POST">
-                <div class="input-box">
-                    <span class="icon"><ion-icon name="mail"></ion-icon></span>
-                    <input type="text" name="username" required>
-                    <label>Username</label>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+    <div class="bg-white shadow-lg rounded-lg w-full max-w-md p-8">
+        <h2 class="text-3xl font-bold text-center text-blue-600 mb-6">Login</h2>
+        <form action="../php/auth.php" method="POST" class="space-y-5">
+            <!-- Username -->
+            <div>
+                <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                <div class="mt-1 relative">
+                    <input type="text" name="username" id="username" required
+                        class="w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
-                <div class="input-box">
-                    <span class="icon"><ion-icon name="lock-closed"></ion-icon></span>
-                    <input type="password" name="password" required>
-                    <label>Password</label>
+            </div>
+
+            <!-- Password -->
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                <div class="mt-1 relative">
+                    <input type="password" name="password" id="password" required
+                        class="w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
-                <!-- <div class="remember-forgot">
-                    <label><input type="checkbox">Remember Me</label>
-                    <a href="#">Forgot Password?</a>
-                </div> -->
-                <button type="submit" name="login" class="btn">Masuk</button>
-                <div class="login-register">
-                    <p>Don't have an account? <a href="#" class="register-link">Register</a></p>
-                </div>
-            </form>
-        </div>
+            </div>
 
-        <!-- Register Form -->
-        <div class="form-box register">
-            <h2>Register</h2>
-            <form action="../php/register.php" method="POST">
+            <!-- Tombol Login -->
+            <button type="submit" name="login"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition">
+                Masuk
+            </button>
 
-                <!-- Username -->
-                <div class="input-box">
-                    <span class="icon"><ion-icon name="person"></ion-icon></span>
-                    <input type="text" name="username" required>
-                    <label>Username</label>
-                </div>
-
-                <!-- Email -->
-                <div class="input-box">
-                    <span class="icon"><ion-icon name="mail"></ion-icon></span>
-                    <input type="email" name="email" required>
-                    <label>Email</label>
-                </div>
-
-                <!-- Password -->
-                <div class="input-box">
-                    <span class="icon"><ion-icon name="lock-closed"></ion-icon></span>
-                    <input type="password" name="password" required>
-                    <label>Password</label>
-                </div>
-
-                <!-- Nama Lengkap -->
-                <div class="input-box">
-                    <span class="icon"><ion-icon name="id-card"></ion-icon></span>
-                    <input type="text" name="nama" required>
-                    <label>Nama Lengkap</label>
-                </div>
-
-                <!-- Alamat -->
-                <div class="input-box">
-                    <span class="icon"><ion-icon name="home"></ion-icon></span>
-                    <input type="text" name="alamat" required>
-                    <label>Alamat</label>
-                </div>
-
-                <!-- No HP -->
-                <div class="input-box">
-                    <span class="icon"><ion-icon name="call"></ion-icon></span>
-                    <input type="text" name="no_hp" required>
-                    <label>No HP</label>
-                </div>
-
-                <!-- No KTP -->
-                <div class="input-box">
-                    <span class="icon"><ion-icon name="card"></ion-icon></span>
-                    <input type="text" name="no_ktp" required>
-                    <label>No KTP</label>
-                </div>
-
-                <!-- Role -->
-                <div class="input-box">
-                    <span class="icon"><ion-icon name="people"></ion-icon></span>
-                    <select name="role" required>
-                        <option value="" disabled selected>Pilih Role</option>
-                        <option value="pelanggan">Pelanggan</option>
-                        <option value="agen">Agen / Pemilik Kendaraan</option>
-                    </select>
-                    <label>Daftar Sebagai</label>
-                </div>
-
-                <!-- Keterangan (opsional, khusus agen) -->
-                <div class="input-box">
-                    <span class="icon"><ion-icon name="document-text"></ion-icon></span>
-                    <input type="text" name="keterangan" placeholder="Keterangan (opsional)">
-                    <label>Keterangan</label>
-                </div>
-
-                <!-- Submit -->
-                <button type="submit" name="register" class="btn">Register</button>
-
-                <div class="login-register">
-                    <p>Already have an account? <a href="#" class="login-link">Login</a></p>
-                </div>
-            </form>
-        </div>
-
-
+            <!-- Link ke Register -->
+            <p class="text-center text-sm text-gray-600 mt-4">
+                Belum punya akun?
+                <a href="register.php" class="text-blue-600 hover:underline">Daftar</a>
+            </p>
+        </form>
     </div>
-
-    <!-- Script -->
-    <script src="../src/js/add-user.js"></script>
-    <script src="../src/js/login.js"></script>
-    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-    <script>
-        const wrapper = document.querySelector('.wrapper');
-        const loginLink = document.querySelector('.login-link');
-        const registerLink = document.querySelector('.register-link');
-        const btnPopup = document.querySelector('.btnLogin-popup');
-        const iconClose = document.querySelector('.icon-close');
-
-        registerLink.addEventListener('click', () => {
-            wrapper.classList.add('active');
-        });
-
-        loginLink.addEventListener('click', () => {
-            wrapper.classList.remove('active');
-        });
-
-        btnPopup.addEventListener('click', () => {
-            wrapper.classList.add('active-popup');
-        });
-
-        iconClose.addEventListener('click', () => {
-            wrapper.classList.remove('active-popup');
-        });
-    </script>
 </body>
 
 </html>
