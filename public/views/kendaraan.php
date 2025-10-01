@@ -50,170 +50,265 @@ if ($count_result) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Kendaraan</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Daftar Kendaraan - RentalKu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
     <style>
         * {
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        
+        .filter-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .vehicle-card {
+            transition: all 0.3s ease;
+        }
+        
+        .vehicle-card:hover {
+            transform: translateY(-8px);
+        }
+        
+        .badge-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .8;
+            }
         }
     </style>
 </head>
 
-<body class="bg-[#fff] overflow-x-hidden w-screen">
+<body class="bg-gradient-to-br from-gray-50 via-blue-50 to-gray-100 overflow-x-hidden">
     <!-- Header -->
     <?php include(__DIR__ . "/../../src/includes/header.php"); ?>
 
     <!-- Main -->
-    <main>
-        <div class="dashboard-container min-h-screen bg-[#f1f4f8] flex flex-col px-10 pt-[80px]">
-            <section class="py-10 px-8 w-full">
-                <h2 class="text-3xl font-bold mb-8 text-center">LIST KENDARAAN</h2>
+    <main class="min-h-screen pt-[80px]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mb-4 shadow-lg">
+                    <i class="ri-car-line text-3xl text-white"></i>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-3">
+                    Katalog Kendaraan
+                </h1>
+                <p class="text-gray-600 text-lg">Pilih kendaraan impian Anda untuk pengalaman berkendara yang tak terlupakan</p>
+            </div>
 
-                <!-- Filter -->
-                <div class="user-filter flex items-center justify-between mb-6">
-                    <ul class="flex space-x-4">
-                        <li>
-                            <a href="?filter=tersedia"
-                                class="px-4 py-2 rounded-lg font-medium <?= ($filter === 'tersedia') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'; ?>">
-                                Tersedia
-                            </a>
-                        </li>
-                        <li>
-                            <a href="?filter=disewa"
-                                class="px-4 py-2 rounded-lg font-medium <?= ($filter === 'disewa') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'; ?>">
-                                Disewa
-                            </a>
-                        </li>
-                        <li>
-                            <a href="?filter=perbaikan"
-                                class="px-4 py-2 rounded-lg font-medium <?= ($filter === 'perbaikan') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'; ?>">
-                                Perbaikan
-                            </a>
-                        </li>
-                        <li>
-                            <a href="?filter=all"
-                                class="px-4 py-2 rounded-lg font-medium <?= ($filter === 'all') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'; ?>">
-                                Semua Kendaraan
-                            </a>
-                        </li>
-                    </ul>
+            <!-- Filter Section -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <!-- Filter Buttons -->
+                    <div class="flex flex-wrap gap-3">
+                        <a href="?filter=all"
+                            class="filter-btn px-6 py-3 rounded-xl font-semibold shadow-md <?= ($filter === 'all') ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'; ?>">
+                            <i class="ri-list-check mr-2"></i>Semua
+                        </a>
+                        <a href="?filter=tersedia"
+                            class="filter-btn px-6 py-3 rounded-xl font-semibold shadow-md <?= ($filter === 'tersedia') ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'; ?>">
+                            <i class="ri-checkbox-circle-line mr-2"></i>Tersedia
+                        </a>
+                        <a href="?filter=disewa"
+                            class="filter-btn px-6 py-3 rounded-xl font-semibold shadow-md <?= ($filter === 'disewa') ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'; ?>">
+                            <i class="ri-time-line mr-2"></i>Disewa
+                        </a>
+                        <a href="?filter=perbaikan"
+                            class="filter-btn px-6 py-3 rounded-xl font-semibold shadow-md <?= ($filter === 'perbaikan') ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'; ?>">
+                            <i class="ri-tools-line mr-2"></i>Perbaikan
+                        </a>
+                    </div>
 
-                    <!-- Tambah kendaraan hanya untuk agen -->
+                    <!-- Tambah Kendaraan Button -->
                     <?php if ($role === 'agen'): ?>
                         <a href="tambah_kendaraan.php"
-                            class="ml-4 bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg font-semibold transition">
-                            + Tambah Kendaraan
+                            class="inline-flex items-center justify-center bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200">
+                            <i class="ri-add-circle-line text-xl mr-2"></i>
+                            Tambah Kendaraan
                         </a>
                     <?php endif; ?>
                 </div>
 
-                <!-- Info jumlah kendaraan -->
-                <p class="text-gray-700 mb-4">
-                    <?php if ($filter === 'all'): ?>
-                        Total ada <span class="font-bold"><?= $total ?></span> kendaraan.
-                    <?php elseif ($filter === 'tersedia'): ?>
-                        Ada <span class="font-bold"><?= $total ?></span> kendaraan tersedia.
-                    <?php elseif ($filter === 'disewa'): ?>
-                        Ada <span class="font-bold"><?= $total ?></span> kendaraan sedang disewa.
-                    <?php elseif ($filter === 'perbaikan'): ?>
-                        Ada <span class="font-bold"><?= $total ?></span> kendaraan dalam perbaikan.
-                    <?php endif; ?>
-                </p>
+                <!-- Info Count -->
+                <div class="mt-4 pt-4 border-t border-gray-200">
+                    <div class="flex items-center text-gray-700">
+                        <i class="ri-information-line text-blue-600 text-xl mr-2"></i>
+                        <?php if ($filter === 'all'): ?>
+                            <span>Total <span class="font-bold text-blue-600"><?= $total ?></span> kendaraan tersedia di katalog</span>
+                        <?php elseif ($filter === 'tersedia'): ?>
+                            <span><span class="font-bold text-green-600"><?= $total ?></span> kendaraan siap untuk dirental</span>
+                        <?php elseif ($filter === 'disewa'): ?>
+                            <span><span class="font-bold text-red-600"><?= $total ?></span> kendaraan sedang dalam masa rental</span>
+                        <?php elseif ($filter === 'perbaikan'): ?>
+                            <span><span class="font-bold text-orange-600"><?= $total ?></span> kendaraan dalam proses maintenance</span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
 
-                <!-- Grid Kendaraan -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <?php if (mysqli_num_rows($result) > 0): ?>
-                        <?php while ($row = mysqli_fetch_assoc($result)): ?>
-                            <div class="bg-white rounded-2xl shadow hover:shadow-lg transition relative overflow-hidden">
-                                <!-- Status Badge -->
-                                <?php if ($row['status'] === 'tersedia'): ?>
-                                    <span class="absolute top-3 left-3 bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                                        Tersedia
-                                    </span>
-                                <?php elseif ($row['status'] === 'disewa'): ?>
-                                    <span class="absolute top-3 left-3 bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                                        Disewa
-                                    </span>
-                                <?php else: ?>
-                                    <span class="absolute top-3 left-3 bg-gray-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                                        Maintenance
-                                    </span>
-                                <?php endif; ?>
-
-                                <!-- Price -->
-                                <span class="absolute bottom-47 right-3 bg-black/70 text-white text-sm font-bold px-4 py-2 rounded-lg">
-                                    Rp <?= number_format($row['harga_sewa'], 0, ',', '.') ?> / Hari
-                                </span>
-
-                                <!-- Image -->
-                                <!-- Image -->
+            <!-- Grid Kendaraan -->
+            <?php if (mysqli_num_rows($result) > 0): ?>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                        <div class="vehicle-card bg-white rounded-2xl shadow-lg overflow-hidden">
+                            <!-- Image Container -->
+                            <div class="relative h-56 overflow-hidden">
                                 <?php if (!empty($row['gambar'])): ?>
                                     <img src="/RentalKu/uploads/<?= htmlspecialchars($row['gambar']) ?>"
                                         alt="<?= htmlspecialchars($row['merk'] . ' ' . $row['tipe']) ?>"
-                                        class="w-full h-52 object-cover rounded-t-2xl">
+                                        class="w-full h-full object-cover hover:scale-110 transition-transform duration-500">
                                 <?php else: ?>
-                                    <div class="w-full h-52 flex items-center justify-center bg-gray-200 text-gray-500 rounded-t-2xl">
-                                        Tidak ada gambar
+                                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                                        <i class="ri-image-line text-6xl text-gray-400"></i>
                                     </div>
                                 <?php endif; ?>
 
+                                <!-- Status Badge -->
+                                <?php if ($row['status'] === 'tersedia'): ?>
+                                    <div class="absolute top-4 left-4 bg-gradient-to-r from-green-500 to-green-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg badge-pulse">
+                                        <i class="ri-checkbox-circle-fill mr-1"></i>Tersedia
+                                    </div>
+                                <?php elseif ($row['status'] === 'disewa'): ?>
+                                    <div class="absolute top-4 left-4 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg">
+                                        <i class="ri-time-fill mr-1"></i>Disewa
+                                    </div>
+                                <?php else: ?>
+                                    <div class="absolute top-4 left-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg">
+                                        <i class="ri-tools-fill mr-1"></i>Maintenance
+                                    </div>
+                                <?php endif; ?>
 
-                                <!-- Content -->
-                                <div class="p-5">
-                                    <h3 class="text-lg font-semibold"><?= $row['merk'] . ' ' . $row['tipe'] ?></h3>
-                                    <p class="text-sm text-gray-500"><?= $row['tahun'] ?> • <?= strtoupper($row['no_plat']) ?></p>
+                                <!-- Price Badge -->
+                                <div class="absolute bottom-4 right-4 bg-black/80 backdrop-blur-sm text-white px-4 py-2 rounded-xl shadow-xl">
+                                    <div class="text-xs opacity-90">Per Hari</div>
+                                    <div class="text-lg font-bold">Rp <?= number_format($row['harga_sewa'], 0, ',', '.') ?></div>
+                                </div>
+                            </div>
 
-                                    <!-- Owner -->
-                                    <p class="text-sm mt-2"><strong>Owner:</strong> <?= htmlspecialchars($row['nama_pemilik']) ?></p>
+                            <!-- Content -->
+                            <div class="p-6">
+                                <!-- Title -->
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">
+                                    <?= htmlspecialchars($row['merk'] . ' ' . $row['tipe']) ?>
+                                </h3>
 
-                                    <!-- Penyewa -->
-                                    <?php if ($row['status'] === 'disewa' && $row['nama_penyewa']): ?>
-                                        <p class="text-sm text-red-600"><strong>Rented by:</strong> <?= htmlspecialchars($row['nama_penyewa']) ?></p>
-                                    <?php endif; ?>
+                                <!-- Info -->
+                                <div class="flex items-center text-gray-600 text-sm mb-4">
+                                    <i class="ri-calendar-line mr-2"></i>
+                                    <span class="mr-4"><?= htmlspecialchars($row['tahun']) ?></span>
+                                    <i class="ri-profile-line mr-2"></i>
+                                    <span class="uppercase font-semibold"><?= htmlspecialchars($row['no_plat']) ?></span>
+                                </div>
 
-                                    <!-- Action -->
+                                <!-- Owner Info -->
+                                <div class="bg-blue-50 rounded-xl p-3 mb-3">
+                                    <div class="flex items-center text-sm">
+                                        <i class="ri-user-line text-blue-600 mr-2"></i>
+                                        <span class="text-gray-600">Owner:</span>
+                                        <span class="ml-2 font-semibold text-gray-800"><?= htmlspecialchars($row['nama_pemilik']) ?></span>
+                                    </div>
+                                </div>
+
+                                <!-- Renter Info -->
+                                <?php if ($row['status'] === 'disewa' && $row['nama_penyewa']): ?>
+                                    <div class="bg-red-50 rounded-xl p-3 mb-4">
+                                        <div class="flex items-center text-sm">
+                                            <i class="ri-user-follow-line text-red-600 mr-2"></i>
+                                            <span class="text-gray-600">Dirental oleh:</span>
+                                            <span class="ml-2 font-semibold text-red-600"><?= htmlspecialchars($row['nama_penyewa']) ?></span>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+
+                                <!-- Action Buttons -->
+                                <div class="space-y-2">
                                     <?php if ($row['status'] === 'tersedia'): ?>
                                         <?php if ($role === 'guest'): ?>
-                                            <a href="../public/login.php"
-                                                class="mt-5 block w-full bg-yellow-500 text-white py-2 rounded-xl font-semibold text-center hover:bg-yellow-600">
-                                                Login untuk Rental
+                                            <a href="../login.php"
+                                                class="block w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white py-3 rounded-xl font-bold text-center shadow-lg hover:shadow-xl transition-all duration-200">
+                                                <i class="ri-login-box-line mr-2"></i>Login untuk Rental
                                             </a>
                                         <?php elseif ($role === 'pelanggan'): ?>
                                             <a href="sewa.php?id=<?= $row['id_kendaraan'] ?>"
-                                                class="mt-5 block w-full bg-blue-600 text-white py-2 rounded-xl font-semibold text-center hover:bg-blue-700">
-                                                Rental Sekarang
+                                                class="block w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-xl font-bold text-center shadow-lg hover:shadow-xl transition-all duration-200">
+                                                <i class="ri-car-line mr-2"></i>Rental Sekarang
                                             </a>
                                         <?php endif; ?>
                                     <?php else: ?>
-                                        <button class="mt-5 w-full bg-gray-400 text-white py-2 rounded-xl font-semibold cursor-not-allowed" disabled>
-                                            Tidak Tersedia
+                                        <button class="w-full bg-gray-300 text-gray-600 py-3 rounded-xl font-bold cursor-not-allowed" disabled>
+                                            <i class="ri-close-circle-line mr-2"></i>Tidak Tersedia
                                         </button>
                                     <?php endif; ?>
 
-                                    <!-- Edit & Hapus hanya agen -->
-                                    <!-- Edit & Hapus hanya untuk agen pemilik kendaraan -->
+                                    <!-- Edit & Delete Buttons for Owner -->
                                     <?php if ($role === 'agen' && isset($_SESSION['id_pemilik']) && $_SESSION['id_pemilik'] == $row['id_pemilik']): ?>
-                                        <div class="flex justify-between mt-3">
+                                        <div class="flex gap-2 mt-3">
                                             <a href="edit_kendaraan.php?id=<?= $row['id_kendaraan'] ?>"
-                                                class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded-lg text-sm">Edit</a>
+                                                class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2.5 rounded-xl font-semibold text-center transition-all duration-200 shadow-md hover:shadow-lg">
+                                                <i class="ri-edit-line mr-1"></i>Edit
+                                            </a>
                                             <a href="hapus_kendaraan.php?id=<?= $row['id_kendaraan'] ?>"
                                                 onclick="return confirm('Yakin ingin menghapus kendaraan ini?')"
-                                                class="bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm">Hapus</a>
+                                                class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2.5 rounded-xl font-semibold text-center transition-all duration-200 shadow-md hover:shadow-lg">
+                                                <i class="ri-delete-bin-line mr-1"></i>Hapus
+                                            </a>
                                         </div>
                                     <?php endif; ?>
-
-
                                 </div>
                             </div>
-                        <?php endwhile; ?>
+                        </div>
+                    <?php endwhile; ?>
+                </div>
+            <?php else: ?>
+                <!-- Empty State -->
+                <div class="bg-white rounded-2xl shadow-lg p-16 text-center">
+                    <div class="inline-flex items-center justify-center w-24 h-24 bg-gray-100 rounded-full mb-6">
+                        <i class="ri-car-line text-5xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-700 mb-3">Tidak Ada Kendaraan</h3>
+                    <p class="text-gray-500 mb-6">
+                        <?php if ($filter === 'all'): ?>
+                            Belum ada kendaraan yang terdaftar di sistem
+                        <?php elseif ($filter === 'tersedia'): ?>
+                            Tidak ada kendaraan yang tersedia saat ini
+                        <?php elseif ($filter === 'disewa'): ?>
+                            Tidak ada kendaraan yang sedang disewa
+                        <?php elseif ($filter === 'perbaikan'): ?>
+                            Tidak ada kendaraan dalam perbaikan
+                        <?php endif; ?>
+                    </p>
+                    <?php if ($role === 'agen'): ?>
+                        <a href="tambah_kendaraan.php" 
+                            class="inline-flex items-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200">
+                            <i class="ri-add-circle-line text-xl mr-2"></i>
+                            Tambah Kendaraan Pertama
+                        </a>
                     <?php else: ?>
-                        <p class="col-span-3 text-center text-gray-500">Tidak ada kendaraan.</p>
+                        <a href="?filter=all" 
+                            class="inline-flex items-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200">
+                            <i class="ri-refresh-line text-xl mr-2"></i>
+                            Lihat Semua Kendaraan
+                        </a>
                     <?php endif; ?>
                 </div>
-            </section>
+            <?php endif; ?>
         </div>
     </main>
+
+    <!-- Footer Spacer -->
+    <div class="h-20"></div>
 </body>
 
 </html>
