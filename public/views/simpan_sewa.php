@@ -37,6 +37,9 @@ $tgl_kembali    = $_POST['tgl_kembali'];
 $lama_sewa      = (int) $_POST['lama_sewa'];
 $harga_total    = (float) $_POST['harga_total'];
 
+// Debug - hapus setelah selesai testing
+error_log("DEBUG - harga_total yang diterima: " . $harga_total);
+
 // Cek kendaraan masih tersedia
 $queryKendaraan = mysqli_query($conn, "SELECT * FROM kendaraan WHERE id_kendaraan = $id_kendaraan LIMIT 1");
 $kendaraan = mysqli_fetch_assoc($queryKendaraan);

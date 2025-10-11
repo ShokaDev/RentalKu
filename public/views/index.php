@@ -330,18 +330,26 @@ if (isset($_SESSION['user_id'])) {
 
                                     <!-- Action Button -->
                                     <?php if ($row['status'] === 'tersedia'): ?>
-                                        <?php if (!isset($_SESSION['user_id'])): ?>
-                                            <a href="../login.php"
-                                                class="block w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-gray-900 py-3 rounded-xl font-bold text-center shadow-lg hover:shadow-xl transition-all duration-200">
-                                                <i class="ri-login-box-line mr-2"></i>Login untuk Rental
-                                            </a>
-                                        <?php else: ?>
-                                            <a href="sewa.php?id=<?= $row['id_kendaraan'] ?>"
-                                                class="block w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-xl font-bold text-center shadow-lg hover:shadow-xl transition-all duration-200">
-                                                <i class="ri-car-line mr-2"></i>Rental Sekarang
-                                            </a>
-                                        <?php endif; ?>
-                                    <?php else: ?>
+    <?php if (!isset($_SESSION['user_id'])): ?>
+        <!-- Belum login -->
+        <a href="../login.php"
+            class="block w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-gray-900 py-3 rounded-xl font-bold text-center shadow-lg hover:shadow-xl transition-all duration-200">
+            <i class="ri-login-box-line mr-2"></i>Login untuk Rental
+        </a>
+    <?php elseif (isset($_SESSION['role']) && $_SESSION['role'] === 'pelanggan'): ?>
+        <!-- Login sebagai pelanggan -->
+        <a href="sewa.php?id=<?= $row['id_kendaraan'] ?>"
+            class="block w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-xl font-bold text-center shadow-lg hover:shadow-xl transition-all duration-200">
+            <i class="ri-car-line mr-2"></i>Rental Sekarang
+        </a>
+    <?php else: ?>
+        <!-- Login sebagai admin/agen -->
+        <button class="w-full bg-gray-300 text-gray-600 py-3 rounded-xl font-bold cursor-not-allowed" disabled>
+            <i class="ri-close-circle-line mr-2"></i>Hanya Pelanggan yang Bisa Rental
+        </button>
+    <?php endif; ?>
+<?php else: ?>
+
                                         <button class="w-full bg-gray-300 text-gray-600 py-3 rounded-xl font-bold cursor-not-allowed" disabled>
                                             <i class="ri-close-circle-line mr-2"></i>Tidak Tersedia
                                         </button>

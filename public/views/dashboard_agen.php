@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 include("../../config/koneksi.php");
@@ -7,8 +6,18 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'agen') {
     die("Access denied");
 }
 
-$id_pemilik = intval($_SESSION['id_pemilik'] ?? 0);
+// Ambil id_user dari session
+$id_user = intval($_SESSION['user_id'] ?? 0);
 
+// Query id_pemilik dari tabel pemilik (sesuaikan nama tabel jika bukan 'pemilik')
+$qPemilik = mysqli_query($conn, "SELECT id_pemilik FROM pemilik WHERE id_user = $id_user LIMIT 1");
+if (!$qPemilik || !($pemilik = mysqli_fetch_assoc($qPemilik))) {
+    echo "<script>alert('Data pemilik tidak ditemukan!'); window.location.href='index.php';</script>";
+    exit;
+}
+$id_pemilik = (int) $pemilik['id_pemilik'];
+
+// Query statistik
 $q1 = mysqli_query($conn, "SELECT COUNT(*) AS total_kendaraan FROM kendaraan WHERE id_pemilik=$id_pemilik");
 $kendaraan = mysqli_fetch_assoc($q1)['total_kendaraan'];
 
@@ -24,7 +33,13 @@ $q4 = mysqli_query($conn, "SELECT COALESCE(SUM(s.harga_total),0) AS pendapatan
     FROM sewa s
     JOIN kendaraan k ON s.id_kendaraan = k.id_kendaraan
     WHERE k.id_pemilik = $id_pemilik");
-$pendapatan = mysqli_fetch_assoc($q4)['pendapatan'];
+$pendapatan = mysqli_fetch_assoc($q4)['pendapatan'] ?? 0; // Default 0 jika null
+
+// Debug sementara untuk cek nilai (hapus setelah selesai testing)
+if (mysqli_error($conn)) {
+    error_log("Error Query q4: " . mysqli_error($conn));
+}
+error_log("DEBUG - id_pemilik: $id_pemilik, pendapatan: $pendapatan");
 ?>
 <!doctype html>
 <html>
@@ -199,7 +214,7 @@ $pendapatan = mysqli_fetch_assoc($q4)['pendapatan'];
                         <i class="ri-funds-line text-2xl"></i>
                     </div>
                     <h3 class="text-lg font-semibold mb-2 opacity-90">Total Pendapatan</h3>
-                    <p class="text-2xl font-bold">Rp <span class="counter" data-target="<?= $pendapatan ?>">0</span></p>
+                    <p class="text-2xl font-bold">Rp <span class="counter" data-target="<?= $pendapatan ?>"><?= number_format($pendapatan, 0, ',', '.') ?: 0 ?></span></p>
                     <p class="text-sm opacity-80 mt-2">Penghasilan keseluruhan</p>
                 </div>
                 <div class="h-2 bg-white/20"></div>
@@ -222,9 +237,6 @@ $pendapatan = mysqli_fetch_assoc($q4)['pendapatan'];
                 </a>
             </div>
         </div>
-
-        
-        </div>
     </main>
 
     <script>
@@ -236,9 +248,9 @@ $pendapatan = mysqli_fetch_assoc($q4)['pendapatan'];
 
         // Counter animation
         document.querySelectorAll('.counter').forEach(counter => {
-            let target = +counter.getAttribute('data-target');
+            let target = parseFloat(counter.getAttribute('data-target')) || 0; // Handle non-numeric
             let current = 0;
-            let increment = Math.ceil(target / 100);
+            let increment = Math.ceil(target / 100) || 1; // Avoid zero increment
 
             let updateCounter = () => {
                 if (current < target) {
@@ -251,6 +263,9 @@ $pendapatan = mysqli_fetch_assoc($q4)['pendapatan'];
                 }
             };
             updateCounter();
+
+            // Debug: Log data-target untuk cek
+            console.log('Counter data-target:', counter.getAttribute('data-target'), 'Parsed:', target);
         });
     </script>
 </body>

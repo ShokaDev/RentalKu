@@ -59,6 +59,7 @@ if (!$kendaraan) {
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -75,66 +76,19 @@ if (!$kendaraan) {
             opacity: 0.1;
         }
     </style>
-    <script>
-        function hitungTotal() {
-            const tglSewa = document.getElementById('tgl_sewa').value;
-            const tglKembali = document.getElementById('tgl_kembali').value;
-            const hargaPerHari = <?= (int)$kendaraan['harga_sewa'] ?>;
 
-            if (tglSewa && tglKembali) {
-                const start = new Date(tglSewa);
-                const end = new Date(tglKembali);
-                const diffTime = end - start;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                
-                if (diffDays > 0) {
-                    const total = diffDays * hargaPerHari;
-                    document.getElementById('lama_sewa').value = diffDays;
-                    document.getElementById('harga_total').value = 'Rp ' + new Intl.NumberFormat('id-ID').format(total);
-                    document.getElementById('harga_total_hidden').value = total;
-                    
-                    // Show summary
-                    document.getElementById('summary-section').classList.remove('hidden');
-                    document.getElementById('summary-days').textContent = diffDays;
-                    document.getElementById('summary-price').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(hargaPerHari);
-                    document.getElementById('summary-total').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(total);
-                } else {
-                    document.getElementById('lama_sewa').value = 0;
-                    document.getElementById('harga_total').value = 'Rp 0';
-                    document.getElementById('harga_total_hidden').value = 0;
-                    document.getElementById('summary-section').classList.add('hidden');
-                }
-            }
-        }
-
-        function validateForm() {
-            const lama = document.getElementById('lama_sewa').value;
-            if (lama <= 0) {
-                alert("Tanggal kembali harus setelah tanggal sewa.");
-                return false;
-            }
-            return true;
-        }
-
-        // Set minimum date to today
-        window.onload = function() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('tgl_sewa').setAttribute('min', today);
-            document.getElementById('tgl_kembali').setAttribute('min', today);
-        }
-    </script>
 </head>
 
 <body class="min-h-screen w-full bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center p-6">
     <div class="w-full max-w-6xl grid lg:grid-cols-2 gap-6">
-        
+
         <!-- Card Kendaraan -->
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col">
             <div class="relative h-64 bg-gray-50 flex items-center justify-center">
                 <?php if (!empty($kendaraan['gambar'])): ?>
                     <img src="../../uploads/<?= htmlspecialchars($kendaraan['gambar']) ?>"
-                         alt="<?= htmlspecialchars($kendaraan['merk']) ?>"
-                         class="max-h-56 object-contain">
+                        alt="<?= htmlspecialchars($kendaraan['merk']) ?>"
+                        class="max-h-56 object-contain">
                 <?php else: ?>
                     <i class="ri-image-line text-6xl text-gray-400"></i>
                 <?php endif; ?>
@@ -163,73 +117,163 @@ if (!$kendaraan) {
 
             <!-- isi form di sini -->
 
-                <form action="simpan_sewa.php" method="POST" class="space-y-3 flex-1 flex flex-col" onsubmit="return validateForm()">
-                    <input type="hidden" name="id_kendaraan" value="<?= $kendaraan['id_kendaraan'] ?>">
-                    <input type="hidden" name="id_pelanggan" value="<?= $pelanggan_id ?>">
-                    <input type="hidden" name="harga_per_hari" value="<?= $kendaraan['harga_sewa'] ?>">
-                    <input type="hidden" id="harga_total_hidden" name="harga_total">
+            <form action="simpan_sewa.php" method="POST" class="space-y-3 flex-1 flex flex-col" onsubmit="return validateForm()">
+                <input type="hidden" name="id_kendaraan" value="<?= $kendaraan['id_kendaraan'] ?>">
+                <input type="hidden" name="id_pelanggan" value="<?= $pelanggan_id ?>">
+                <input type="hidden" name="harga_per_hari" value="<?= $kendaraan['harga_sewa'] ?>">
+                <input type="hidden" id="harga_total_hidden" name="harga_total">
 
-                    <!-- Tanggal Sewa -->
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Tanggal Mulai</label>
-                        <input type="date" name="tgl_sewa" id="tgl_sewa" required
-                               class="w-full px-3 py-2 border rounded-lg text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
-                               onchange="hitungTotal()">
-                    </div>
 
-                    <!-- Tanggal Kembali -->
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Tanggal Kembali</label>
-                        <input type="date" name="tgl_kembali" id="tgl_kembali" required
-                               class="w-full px-3 py-2 border rounded-lg text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
-                               onchange="hitungTotal()">
-                    </div>
+                <!-- Tanggal Sewa -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Tanggal Mulai</label>
+                    <input type="date" name="tgl_sewa" id="tgl_sewa" required
+                        class="w-full px-3 py-2 border rounded-lg text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+                        onchange="hitungTotal()">
+                </div>
 
-                    <!-- Lama Sewa -->
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Lama Sewa (hari)</label>
-                        <input type="number" id="lama_sewa" readonly
-                               class="w-full px-3 py-2 border rounded-lg bg-gray-100 text-sm font-semibold">
-                    </div>
+                <!-- Tanggal Kembali -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Tanggal Kembali</label>
+                    <input type="date" name="tgl_kembali" id="tgl_kembali" required
+                        class="w-full px-3 py-2 border rounded-lg text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+                        onchange="hitungTotal()">
+                </div>
 
-                    <!-- Total Harga -->
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Total Harga</label>
-                        <input type="text" id="harga_total" readonly
-                               class="w-full px-3 py-2 border rounded-lg bg-gray-100 text-sm font-bold">
-                    </div>
+                <!-- Lama Sewa -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Lama Sewa (hari)</label>
+                    <input type="number" id="lama_sewa_display" readonly
+                        class="w-full px-3 py-2 border rounded-lg bg-gray-100 text-sm font-semibold">
+                    <!-- hidden field untuk dikirim ke PHP -->
+                    <input type="hidden" name="lama_sewa" id="lama_sewa">
+                </div>
 
-                    <!-- Metode Pembayaran -->
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Metode Pembayaran</label>
-                        <select name="metode_pembayaran" id="metode_pembayaran" required
-                                class="w-full px-3 py-2 border rounded-lg text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200 bg-white">
-                            <option value="">-- Pilih Metode --</option>
-                            <option value="Transfer Bank">Transfer Bank</option>
-                            <option value="E-Wallet">E-Wallet</option>
-                            <option value="Tunai">Tunai</option>
-                        </select>
-                    </div>
+                <!-- Total Harga -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Total Harga</label>
+                    <input type="text" id="harga_total_display" readonly
+                        class="w-full px-3 py-2 border rounded-lg bg-gray-100 text-sm font-bold">
+                    <input type="hidden" name="harga_total" id="harga_total_hidden">
+                </div>
 
-                    <!-- Ringkasan -->
-                    <div id="summary-section" class="hidden bg-purple-50 border border-purple-200 rounded-lg p-3 text-sm">
-                        <p><strong>Durasi:</strong> <span id="summary-days">0</span> hari</p>
-                        <p><strong>Harga/hari:</strong> <span id="summary-price">Rp 0</span></p>
-                        <p class="font-bold text-purple-600 border-t mt-2 pt-2">
-                            Total: <span id="summary-total">Rp 0</span>
-                        </p>
-                    </div>
 
-                    <!-- Submit -->
-                    <button type="submit"
-                            class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-bold text-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
-                        Konfirmasi Pemesanan
-                    </button>
-                </form>
-            </div>
+                <!-- Metode Pembayaran -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Metode Pembayaran</label>
+                    <select name="metode_pembayaran" id="metode_pembayaran" required
+                        class="w-full px-3 py-2 border rounded-lg text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200 bg-white">
+                        <option value="">-- Pilih Metode --</option>
+                        <option value="Transfer Bank">Transfer Bank</option>
+                        <option value="E-Wallet">E-Wallet</option>
+                        <option value="Tunai">Tunai</option>
+                    </select>
+                </div>
+
+                <!-- Ringkasan -->
+                <div id="summary-section" class="hidden bg-purple-50 border border-purple-200 rounded-lg p-3 text-sm">
+                    <p><strong>Durasi:</strong> <span id="summary-days">0</span> hari</p>
+                    <p><strong>Harga/hari:</strong> <span id="summary-price">Rp 0</span></p>
+                    <p class="font-bold text-purple-600 border-t mt-2 pt-2">
+                        Total: <span id="summary-total">Rp 0</span>
+                    </p>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit"
+                    class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-bold text-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+                    Konfirmasi Pemesanan
+                </button>
+            </form>
         </div>
     </div>
+    </div>
 </body>
+<script>
+    function hitungTotal() {
+    const tglSewa = document.getElementById('tgl_sewa').value;
+    const tglKembali = document.getElementById('tgl_kembali').value;
+    const hargaPerHari = <?= (int)$kendaraan['harga_sewa'] ?>;
+
+    if (tglSewa && tglKembali) {
+        const start = new Date(tglSewa);
+        const end = new Date(tglKembali);
+        const diffTime = end - start;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays > 0) {
+            const total = diffDays * hargaPerHari;
+
+            // update input tampilan
+            document.getElementById('lama_sewa_display').value = diffDays;
+            document.getElementById('harga_total_display').value =
+                'Rp ' + new Intl.NumberFormat('id-ID').format(total);
+
+            // update input hidden (biar terkirim ke PHP)
+            document.getElementById('lama_sewa').value = diffDays;
+            document.getElementById('harga_total_hidden').value = total;
+
+                // show summary
+                document.getElementById('summary-section').classList.remove('hidden');
+                document.getElementById('summary-days').textContent = diffDays;
+                document.getElementById('summary-price').textContent =
+                    'Rp ' + new Intl.NumberFormat('id-ID').format(hargaPerHari);
+                document.getElementById('summary-total').textContent =
+                    'Rp ' + new Intl.NumberFormat('id-ID').format(total);
+
+            } else {
+                // reset kalau tanggal salah
+                document.getElementById('lama_sewa_display').value = 0;
+                document.getElementById('lama_sewa').value = 0;
+                document.getElementById('harga_total').value = 'Rp 0';
+                document.getElementById('harga_total_hidden').value = 0;
+                document.getElementById('summary-section').classList.add('hidden');
+            }
+        }
+    }
+
+
+    function validateForm() {
+        hitungTotal(); // paksa update dulu
+
+        const tglSewa = document.getElementById('tgl_sewa').value;
+        const tglKembali = document.getElementById('tgl_kembali').value;
+        const lama = parseInt(document.getElementById('lama_sewa').value) || 0;
+        const total = parseInt(document.getElementById('harga_total_hidden').value) || 0;
+        const metode = document.getElementById('metode_pembayaran').value;
+
+        if (!tglSewa || !tglKembali) {
+            alert("Harap isi tanggal sewa dan tanggal kembali.");
+            return false;
+        }
+
+        if (lama <= 0) {
+            alert("Tanggal kembali harus setelah tanggal sewa.");
+            return false;
+        }
+
+        if (total <= 0) {
+            alert("Total harga tidak valid.");
+            return false;
+        }
+
+        if (!metode) {
+            alert("Pilih metode pembayaran.");
+            return false;
+        }
+
+        return true;
+    }
+
+
+
+    // Set minimum date to today
+    window.onload = function() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('tgl_sewa').setAttribute('min', today);
+        document.getElementById('tgl_kembali').setAttribute('min', today);
+    }
+</script>
 
 
 </html>

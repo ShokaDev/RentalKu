@@ -279,7 +279,7 @@ $pelanggan = mysqli_fetch_assoc($q6)['total_pelanggan'];
             </a>
 
             <!-- Data Kendaraan -->
-            <a href="pelanggan.php"
+            <a href="kendaraan_pelanggan.php"
                class="flex flex-col items-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 
                       hover:from-purple-100 hover:to-purple-200 rounded-2xl shadow-sm hover:shadow-md 
                       transition-all duration-300 transform hover:-translate-y-1 w-52">

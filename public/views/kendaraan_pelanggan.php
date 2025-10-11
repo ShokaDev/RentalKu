@@ -55,7 +55,7 @@ $total_pages = ceil($total / $limit);
     <nav class="bg-blue-600 p-4 text-white flex justify-between items-center shadow">
         <h1 class="text-xl font-bold">RentalKu - Kendaraan</h1>
         <div>
-            <a href="dashboard_pelanggan.php"
+            <a href="dashboard_admin.php"
                 class="bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-200 transition">Dashboard</a>
             <a href="../../php/logout.php"
                 class="ml-2 bg-red-500 px-4 py-2 rounded-lg font-semibold hover:bg-red-600 transition">Logout</a>
