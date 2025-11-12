@@ -7,18 +7,29 @@ if (!isset($_SESSION['id_pemilik'])) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $id_pemilik = $_SESSION['id_pemilik'];
+    $id_pemilik  = $_SESSION['id_pemilik'];
     $no_plat     = trim($_POST['no_plat']);
     $merk        = $_POST['merk'];
     $tipe        = $_POST['tipe'];
     $tahun       = $_POST['tahun'];
     $harga_sewa  = $_POST['harga_sewa'];
     $status      = "Tersedia";
+    $id_lokasi   = isset($_POST['id_lokasi']) ? intval($_POST['id_lokasi']) : 0;
+
+    // Pastikan lokasi dipilih
+    if ($id_lokasi <= 0) {
+        header("Location: ../../public/views/tambah_kendaraan.php?error=Harap pilih lokasi kendaraan");
+        exit;
+    }
 
     // Upload gambar
     $gambar = null;
     if (!empty($_FILES['gambar']['name'])) {
         $targetDir = "../../uploads/";
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0777, true);
+        }
+
         $gambar = time() . "_" . basename($_FILES["gambar"]["name"]);
         $targetFile = $targetDir . $gambar;
         move_uploaded_file($_FILES["gambar"]["tmp_name"], $targetFile);
@@ -31,8 +42,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
-    $sql = "INSERT INTO kendaraan (id_pemilik, no_plat, merk, tipe, tahun, harga_sewa, gambar, status) 
-            VALUES ('$id_pemilik','$no_plat','$merk','$tipe','$tahun','$harga_sewa','$gambar','$status')";
+    // Simpan kendaraan
+    $sql = "INSERT INTO kendaraan 
+            (id_pemilik, no_plat, merk, tipe, tahun, harga_sewa, gambar, status, id_lokasi) 
+            VALUES 
+            ('$id_pemilik', '$no_plat', '$merk', '$tipe', '$tahun', '$harga_sewa', '$gambar', '$status', '$id_lokasi')";
     
     if (mysqli_query($conn, $sql)) {
         header("Location: ../../public/views/kendaraan.php?success=Kendaraan berhasil ditambahkan");

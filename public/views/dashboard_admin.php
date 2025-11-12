@@ -251,45 +251,68 @@ $pelanggan = mysqli_fetch_assoc($q6)['total_pelanggan'];
             </div>
         </div>
 
+        
+        
         <!-- Quick Actions -->
         <div class="mt-10 bg-white rounded-2xl shadow-xl p-6">
-    <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-6 flex items-center justify-center gap-2">
-        <i class="ri-flashlight-line text-blue-600 text-2xl"></i>
-        Quick Actions
-    </h2>
+            <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-6 flex items-center justify-center gap-2">
+                <i class="ri-flashlight-line text-blue-600 text-2xl"></i>
+                Quick Actions
+            </h2>
 
-    <div class="flex justify-center">
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl">
-            <!-- Data Pemilik -->
-            <a href="pemilik.php"
-               class="flex flex-col items-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 
+            <div class="flex justify-center">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl">
+                    <!-- Data Pemilik -->
+                    <a href="pemilik.php"
+                        class="flex flex-col items-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 
                       hover:from-blue-100 hover:to-blue-200 rounded-2xl shadow-sm hover:shadow-md 
                       transition-all duration-300 transform hover:-translate-y-1 w-52">
-                <i class="ri-user-star-line text-4xl text-blue-600 mb-3"></i>
-                <span class="text-sm font-semibold text-gray-700">Data Pemilik</span>
-            </a>
+                        <i class="ri-user-star-line text-4xl text-blue-600 mb-3"></i>
+                        <span class="text-sm font-semibold text-gray-700">Data Pemilik</span>
+                    </a>
 
-            <!-- Data Pelanggan -->
-            <a href="pelanggan.php"
-               class="flex flex-col items-center p-6 bg-gradient-to-br from-green-50 to-green-100 
+                    <!-- Data Pelanggan -->
+                    <a href="pelanggan.php"
+                        class="flex flex-col items-center p-6 bg-gradient-to-br from-green-50 to-green-100 
                       hover:from-green-100 hover:to-green-200 rounded-2xl shadow-sm hover:shadow-md 
                       transition-all duration-300 transform hover:-translate-y-1 w-52">
-                <i class="ri-team-line text-4xl text-green-600 mb-3"></i>
-                <span class="text-sm font-semibold text-gray-700">Data Pelanggan</span>
-            </a>
+                        <i class="ri-team-line text-4xl text-green-600 mb-3"></i>
+                        <span class="text-sm font-semibold text-gray-700">Data Pelanggan</span>
+                    </a>
 
-            <!-- Data Kendaraan -->
-            <a href="kendaraan_pelanggan.php"
-               class="flex flex-col items-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 
+                    <!-- Data Kendaraan -->
+                    <a href="kendaraan_pelanggan.php"
+                        class="flex flex-col items-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 
                       hover:from-purple-100 hover:to-purple-200 rounded-2xl shadow-sm hover:shadow-md 
                       transition-all duration-300 transform hover:-translate-y-1 w-52">
-                <i class="ri-car-line text-4xl text-purple-600 mb-3"></i>
-                <span class="text-sm font-semibold text-gray-700">Data Kendaraan</span>
-            </a>
+                        <i class="ri-car-line text-4xl text-purple-600 mb-3"></i>
+                        <span class="text-sm font-semibold text-gray-700">Data Kendaraan</span>
+                    </a>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
 
+        <form method="POST" action="tambah_lokasi.php" class="flex gap-2 my-4">
+            <input type="text" name="nama_lokasi" placeholder="Nama lokasi" required class="border px-3 py-2 rounded-lg w-full">
+            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg">Tambah</button>
+        </form>
+    
+        <table class="w-full border">
+            <tr class="bg-gray-100">
+                <th class="p-2 text-left">Nama Lokasi</th>
+                <th class="p-2 text-left">Aksi</th>
+            </tr>
+            <?php
+            $lokasi_list = mysqli_query($conn, "SELECT * FROM lokasi");
+            while ($lok = mysqli_fetch_assoc($lokasi_list)): ?>
+                <tr>
+                    <td class="p-2"><?= htmlspecialchars($lok['nama_lokasi']) ?></td>
+                    <td class="p-2">
+                        <a href="hapus_lokasi.php?id=<?= $lok['id_lokasi'] ?>" class="text-red-500 hover:underline">Hapus</a>
+                    </td>
+                </tr>
+            <?php endwhile; ?>
+        </table>
 
     </main>
 

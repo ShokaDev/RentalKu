@@ -14,15 +14,41 @@ if (!isset($_GET['id'])) {
 }
 
 $id = intval($_GET['id']);
-$id_pemilik = $_SESSION['id_pemilik'];
+$id_pemilik = intval($_SESSION['id_pemilik'] ?? 0);
 
 // Ambil data kendaraan milik agen
-$query = mysqli_query($conn, "SELECT * FROM kendaraan WHERE id_kendaraan='$id' AND id_pemilik='$id_pemilik'");
+$query = mysqli_query($conn, "SELECT k.*, l.nama_lokasi 
+                              FROM kendaraan k 
+                              LEFT JOIN lokasi l ON k.id_lokasi = l.id_lokasi 
+                              WHERE k.id_kendaraan = '$id' AND k.id_pemilik = '$id_pemilik'");
 if (mysqli_num_rows($query) == 0) {
     header("Location: kendaraan.php?error=not_owner");
     exit;
 }
 $data = mysqli_fetch_assoc($query);
+
+// Ambil daftar lokasi
+$lokasi_query = mysqli_query($conn, "SELECT id_lokasi, nama_lokasi FROM lokasi ORDER BY nama_lokasi");
+$lokasi_list = mysqli_fetch_all($lokasi_query, MYSQLI_ASSOC);
+
+// Cek apakah ada pesan error dari redirect
+$error_message = '';
+if (isset($_GET['error'])) {
+    switch ($_GET['error']) {
+        case 'invalid_input':
+            $error_message = 'Harap isi semua field wajib dengan benar.';
+            break;
+        case 'invalid_file':
+            $error_message = 'File gambar tidak valid (hanya JPG/PNG, maks 2MB).';
+            break;
+        case 'upload_failed':
+            $error_message = 'Gagal mengunggah gambar.';
+            break;
+        case 'update_failed':
+            $error_message = 'Gagal memperbarui kendaraan. Silakan coba lagi.';
+            break;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -49,6 +75,16 @@ $data = mysqli_fetch_assoc($query);
             <p class="text-gray-600">Perbarui informasi kendaraan Anda</p>
         </div>
 
+        <!-- Error Message -->
+        <?php if ($error_message): ?>
+            <div class="mb-6 p-4 bg-red-100 text-red-700 rounded-xl flex items-center gap-2">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                </svg>
+                <span><?= htmlspecialchars($error_message) ?></span>
+            </div>
+        <?php endif; ?>
+
         <!-- Main Card -->
         <div id="formCard" class="bg-white shadow-xl rounded-3xl overflow-hidden opacity-0">
             
@@ -64,8 +100,8 @@ $data = mysqli_fetch_assoc($query);
 
             <!-- Form Container -->
             <div class="p-8 md:p-10">
-                <form action="../../php/kendaraan/update_kendaraan.php" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" name="id_kendaraan" value="">
+                <form id="editKendaraanForm" action="../../php/kendaraan/update_kendaraan.php" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="id_kendaraan" value="<?= htmlspecialchars($data['id_kendaraan']) ?>">
 
                     <!-- Grid Layout for Form Fields -->
                     <div class="grid md:grid-cols-2 gap-6 mb-6">
@@ -81,7 +117,7 @@ $data = mysqli_fetch_assoc($query);
                                     No Plat <span class="text-red-500">*</span>
                                 </span>
                             </label>
-                            <input type="text" name="no_plat" value="B 1234 XYZ" 
+                            <input type="text" name="no_plat" value="<?= htmlspecialchars($data['no_plat']) ?>" 
                                    class="w-full border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 px-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300" required>
                         </div>
 
@@ -95,7 +131,7 @@ $data = mysqli_fetch_assoc($query);
                                     Merk
                                 </span>
                             </label>
-                            <input type="text" name="merk" value="Toyota" 
+                            <input type="text" name="merk" value="<?= htmlspecialchars($data['merk']) ?>" 
                                    class="w-full border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 px-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300">
                         </div>
 
@@ -109,7 +145,7 @@ $data = mysqli_fetch_assoc($query);
                                     Tipe
                                 </span>
                             </label>
-                            <input type="text" name="tipe" value="Avanza" 
+                            <input type="text" name="tipe" value="<?= htmlspecialchars($data['tipe']) ?>" 
                                    class="w-full border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 px-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300">
                         </div>
 
@@ -123,7 +159,7 @@ $data = mysqli_fetch_assoc($query);
                                     Tahun
                                 </span>
                             </label>
-                            <input type="number" name="tahun" value="2023" min="1990" max="2099" 
+                            <input type="number" name="tahun" value="<?= htmlspecialchars($data['tahun']) ?>" min="1990" max="2099" 
                                    class="w-full border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 px-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300">
                         </div>
 
@@ -140,9 +176,30 @@ $data = mysqli_fetch_assoc($query);
                             </label>
                             <div class="relative">
                                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">Rp</span>
-                                <input type="number" name="harga_sewa" value="350000" step="0.01" 
+                                <input type="number" name="harga_sewa" value="<?= htmlspecialchars($data['harga_sewa']) ?>" step="0.01" 
                                        class="w-full border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 pl-12 pr-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300" required>
                             </div>
+                        </div>
+
+                        <!-- Lokasi -->
+                        <div class="group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    Lokasi <span class="text-red-500">*</span>
+                                </span>
+                            </label>
+                            <select name="id_lokasi" class="w-full border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 px-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300 bg-white cursor-pointer" required>
+                                <option value="">-- Pilih Lokasi --</option>
+                                <?php foreach ($lokasi_list as $lokasi): ?>
+                                    <option value="<?= htmlspecialchars($lokasi['id_lokasi']) ?>" 
+                                            <?= $data['id_lokasi'] == $lokasi['id_lokasi'] ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($lokasi['nama_lokasi']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
 
                         <!-- Status -->
@@ -155,11 +212,11 @@ $data = mysqli_fetch_assoc($query);
                                     Status
                                 </span>
                             </label>
-                            <select name="status" 
-                                    class="w-full border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 px-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300 bg-white cursor-pointer">
-                                <option value="tersedia" selected>✓ Tersedia</option>
-                                <option value="disewa">⊗ Disewa</option>
-                                <option value="perbaikan">🔧 Perbaikan</option>
+                            <select name="status" class="w-full border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 px-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300 bg-white cursor-pointer">
+                                <option value="tersedia" <?= $data['status'] == 'tersedia' ? 'selected' : '' ?>>✓ Tersedia</option>
+                                <option value="disewa" <?= $data['status'] == 'disewa' ? 'selected' : '' ?>>⊗ Disewa</option>
+                                <option value="perbaikan" <?= $data['status'] == 'perbaikan' ? 'selected' : '' ?>>🔧 Perbaikan</option>
+                                <option value="pending" <?= $data['status'] == 'pending' ? 'selected' : '' ?>>⏳ Pending</option>
                             </select>
                         </div>
                     </div>
@@ -180,11 +237,13 @@ $data = mysqli_fetch_assoc($query);
                             <p class="text-sm font-medium text-gray-700 mb-3">Foto Saat Ini:</p>
                             <div class="relative inline-block">
                                 <?php if (!empty($data['gambar'])): ?>
-                    <img src="/RentalKu/uploads/<?= $data['gambar'] ?>" class="mt-3 w-48 h-32 object-cover rounded-lg border">
-                <?php endif; ?>
-                                <div class="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                                    Foto Aktif
-                                </div>
+                                    <img src="/RentalKu/uploads/<?= htmlspecialchars($data['gambar']) ?>" class="mt-3 w-48 h-32 object-cover rounded-lg border">
+                                    <div class="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                                        Foto Aktif
+                                    </div>
+                                <?php else: ?>
+                                    <p class="text-sm text-gray-500">Belum ada foto</p>
+                                <?php endif; ?>
                             </div>
                         </div>
                         
@@ -197,8 +256,6 @@ $data = mysqli_fetch_assoc($query);
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
                                 </svg>
                                 <p class="text-gray-600 font-medium mb-1">Upload foto baru (opsional)</p>
-                                <!-- <p class="text-sm text-gray-500">Klik atau drag foto ke sini</p> -->
-                                <!-- <p class="text-xs text-gray-400 mt-2">Format: JPG, PNG (Maks. 2MB)</p> -->
                             </div>
                             
                             <!-- New Preview Container -->
@@ -329,6 +386,15 @@ $data = mysqli_fetch_assoc($query);
             if (files.length > 0) {
                 gambarInput.files = files;
                 gambarInput.dispatchEvent(new Event("change"));
+            }
+        });
+
+        // Form Validation
+        document.getElementById("editKendaraanForm").addEventListener("submit", function(event) {
+            const idLokasi = document.querySelector("select[name='id_lokasi']").value;
+            if (!idLokasi) {
+                event.preventDefault();
+                alert("Harap pilih lokasi kendaraan.");
             }
         });
     </script>

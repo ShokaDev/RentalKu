@@ -22,7 +22,6 @@ $q = mysqli_query($conn, "SELECT * FROM kendaraan WHERE id_pemilik = $id_pemilik
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 
-
 <body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
     <!-- Sidebar -->
     <aside class="w-64 bg-gradient-to-b from-green-600 to-green-700 text-white fixed h-full shadow-2xl z-50">
@@ -59,10 +58,16 @@ $q = mysqli_query($conn, "SELECT * FROM kendaraan WHERE id_pemilik = $id_pemilik
                 <h1 class="text-4xl font-bold text-gray-800">
                     <i class="ri-car-line text-green-600"></i> Kendaraan Saya
                 </h1>
-                <a href="tambah_kendaraan.php" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2">
-                    <i class="ri-add-line text-xl"></i>
-                    <span>Tambah Kendaraan</span>
-                </a>
+                <div class="flex space-x-4">
+                    <a href="konfirmasi_sewa.php" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2">
+                        <i class="ri-file-list-3-line text-xl"></i>
+                        <span>Lihat Pesanan Sewa</span>
+                    </a>
+                    <a href="tambah_kendaraan.php" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2">
+                        <i class="ri-add-line text-xl"></i>
+                        <span>Tambah Kendaraan</span>
+                    </a>
+                </div>
             </div>
             <p class="text-gray-600">Kelola semua kendaraan rental Anda di sini</p>
         </div>
@@ -85,13 +90,21 @@ $q = mysqli_query($conn, "SELECT * FROM kendaraan WHERE id_pemilik = $id_pemilik
                             <?php endif; ?>
                             
                             <!-- Status Badge -->
-                            <?php if ($row['status'] === 'disewa'): ?>
+                            <?php if ($row['status'] === 'tersedia'): ?>
+                                <div class="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
+                                    <i class="ri-check-line"></i> Tersedia
+                                </div>
+                            <?php elseif ($row['status'] === 'disewa'): ?>
                                 <div class="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
                                     <i class="ri-time-line"></i> Disewa
                                 </div>
-                            <?php else: ?>
-                                <div class="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
-                                    <i class="ri-check-line"></i> Tersedia
+                            <?php elseif ($row['status'] === 'perbaikan'): ?>
+                                <div class="absolute top-4 right-4 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
+                                    <i class="ri-tools-line"></i> Perbaikan
+                                </div>
+                            <?php elseif ($row['status'] === 'pending'): ?>
+                                <div class="absolute top-4 right-4 bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
+                                    <i class="ri-hourglass-line"></i> Pending
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -121,6 +134,11 @@ $q = mysqli_query($conn, "SELECT * FROM kendaraan WHERE id_pemilik = $id_pemilik
                                        onclick="return confirm('Tandai kendaraan ini sebagai tersedia?')"
                                        class="block w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2.5 rounded-xl text-center font-semibold transition-all duration-200 shadow-md hover:shadow-lg">
                                         <i class="ri-check-double-line"></i> Tandai Tersedia
+                                    </a>
+                                <?php elseif ($row['status'] === 'pending'): ?>
+                                    <a href="konfirmasi_sewa.php"
+                                       class="block w-full bg-blue-500 hover:bg-blue-600 text-white py-2.5 rounded-xl text-center font-semibold transition-all duration-200 shadow-md hover:shadow-lg">
+                                        <i class="ri-file-list-3-line"></i> Konfirmasi Pesanan
                                     </a>
                                 <?php else: ?>
                                     <div class="block w-full bg-green-100 text-green-700 py-2.5 rounded-xl text-center font-semibold border-2 border-green-300">

@@ -23,7 +23,7 @@ if (isset($_SESSION['user_id'])) {
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Remix Icons -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
-    
+
     <style>
         * {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -38,7 +38,7 @@ if (isset($_SESSION['user_id'])) {
         }
 
         .hero-pattern {
-            background-image: 
+            background-image:
                 radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
                 radial-gradient(circle at 80% 80%, rgba(99, 102, 241, 0.3) 0%, transparent 50%);
         }
@@ -71,13 +71,19 @@ if (isset($_SESSION['user_id'])) {
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
             animation: shine 3s infinite;
         }
 
         @keyframes shine {
-            0% { left: -100%; }
-            50%, 100% { left: 100%; }
+            0% {
+                left: -100%;
+            }
+
+            50%,
+            100% {
+                left: 100%;
+            }
         }
 
         .float-animation {
@@ -85,8 +91,15 @@ if (isset($_SESSION['user_id'])) {
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
         }
 
         .gradient-text {
@@ -154,7 +167,7 @@ if (isset($_SESSION['user_id'])) {
 
                         <!-- Stats -->
                         <div class="grid grid-cols-3 gap-6 pt-8">
-                           
+
                         </div>
                     </div>
 
@@ -173,7 +186,7 @@ if (isset($_SESSION['user_id'])) {
             <!-- Wave Divider -->
             <div class="absolute bottom-0 left-0 w-full">
                 <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="#F9FAFB"/>
+                    <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="#F9FAFB" />
                 </svg>
             </div>
         </section>
@@ -330,25 +343,25 @@ if (isset($_SESSION['user_id'])) {
 
                                     <!-- Action Button -->
                                     <?php if ($row['status'] === 'tersedia'): ?>
-    <?php if (!isset($_SESSION['user_id'])): ?>
-        <!-- Belum login -->
-        <a href="../login.php"
-            class="block w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-gray-900 py-3 rounded-xl font-bold text-center shadow-lg hover:shadow-xl transition-all duration-200">
-            <i class="ri-login-box-line mr-2"></i>Login untuk Rental
-        </a>
-    <?php elseif (isset($_SESSION['role']) && $_SESSION['role'] === 'pelanggan'): ?>
-        <!-- Login sebagai pelanggan -->
-        <a href="sewa.php?id=<?= $row['id_kendaraan'] ?>"
-            class="block w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-xl font-bold text-center shadow-lg hover:shadow-xl transition-all duration-200">
-            <i class="ri-car-line mr-2"></i>Rental Sekarang
-        </a>
-    <?php else: ?>
-        <!-- Login sebagai admin/agen -->
-        <button class="w-full bg-gray-300 text-gray-600 py-3 rounded-xl font-bold cursor-not-allowed" disabled>
-            <i class="ri-close-circle-line mr-2"></i>Hanya Pelanggan yang Bisa Rental
-        </button>
-    <?php endif; ?>
-<?php else: ?>
+                                        <?php if (!isset($_SESSION['user_id'])): ?>
+                                            <!-- Belum login -->
+                                            <a href="../login.php"
+                                                class="block w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-gray-900 py-3 rounded-xl font-bold text-center shadow-lg hover:shadow-xl transition-all duration-200">
+                                                <i class="ri-login-box-line mr-2"></i>Login untuk Rental
+                                            </a>
+                                        <?php elseif (isset($_SESSION['role']) && $_SESSION['role'] === 'pelanggan'): ?>
+                                            <!-- Login sebagai pelanggan -->
+                                            <a href="sewa.php?id=<?= $row['id_kendaraan'] ?>"
+                                                class="block w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-xl font-bold text-center shadow-lg hover:shadow-xl transition-all duration-200">
+                                                <i class="ri-car-line mr-2"></i>Rental Sekarang
+                                            </a>
+                                        <?php else: ?>
+                                            <!-- Login sebagai admin/agen -->
+                                            <button class="w-full bg-gray-300 text-gray-600 py-3 rounded-xl font-bold cursor-not-allowed" disabled>
+                                                <i class="ri-close-circle-line mr-2"></i>Hanya Pelanggan yang Bisa Rental
+                                            </button>
+                                        <?php endif; ?>
+                                    <?php else: ?>
 
                                         <button class="w-full bg-gray-300 text-gray-600 py-3 rounded-xl font-bold cursor-not-allowed" disabled>
                                             <i class="ri-close-circle-line mr-2"></i>Tidak Tersedia

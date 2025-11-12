@@ -11,10 +11,19 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'agen') {
 // Ambil data agen dari session
 $id_pemilik = $_SESSION['user_id'];   // asumsi saat login id_pemilik disimpan di session user_id
 $nama_pemilik = $_SESSION['username']; // asumsi nama agen disimpan di session username
+
+// Ambil daftar lokasi dari tabel lokasi (disediakan admin)
+$lokasi_query = mysqli_query($conn, "SELECT * FROM lokasi ORDER BY nama_lokasi ASC");
+$lokasi_data = [];
+while ($lok = mysqli_fetch_assoc($lokasi_query)) {
+    $lokasi_data[] = $lok;
+}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,11 +31,12 @@ $nama_pemilik = $_SESSION['username']; // asumsi nama agen disimpan di session u
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
+
 <body class="bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 min-h-screen py-8 px-4">
 
     <!-- Container -->
     <div class="max-w-4xl mx-auto">
-        
+
         <!-- Header Section -->
         <div id="header" class="text-center mb-8 opacity-0">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-lg mb-4">
@@ -40,11 +50,11 @@ $nama_pemilik = $_SESSION['username']; // asumsi nama agen disimpan di session u
 
         <!-- Main Card -->
         <div id="formCard" class="bg-white shadow-xl rounded-3xl overflow-hidden opacity-0">
-            
+
             <!-- Form Container -->
             <div class="p-8 md:p-10">
                 <form action="../../php/kendaraan/simpan_kendaraan.php" method="POST" enctype="multipart/form-data">
-                    
+
                     <!-- Agent Info Badge -->
                     <div class="mb-8 p-5 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-200">
                         <div class="flex items-center gap-3">
@@ -55,8 +65,8 @@ $nama_pemilik = $_SESSION['username']; // asumsi nama agen disimpan di session u
                             </div>
                             <div class="flex-1">
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Nama Agen</label>
-                                 <input type="text" value="<?= htmlspecialchars($nama_pemilik) ?>" 
-                       class="w-full border border-gray-300 bg-gray-100 px-3 py-2 rounded-lg" disabled>
+                                <input type="text" value="<?= htmlspecialchars($nama_pemilik) ?>"
+                                    class="w-full border border-gray-300 bg-gray-100 px-3 py-2 rounded-lg" disabled>
                                 <input type="hidden" name="id_pemilik" value="">
                             </div>
                         </div>
@@ -64,7 +74,7 @@ $nama_pemilik = $_SESSION['username']; // asumsi nama agen disimpan di session u
 
                     <!-- Grid Layout for Form Fields -->
                     <div class="grid md:grid-cols-2 gap-6 mb-6">
-                        
+
                         <!-- No Plat -->
                         <div class="group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">
@@ -76,8 +86,8 @@ $nama_pemilik = $_SESSION['username']; // asumsi nama agen disimpan di session u
                                     No Plat <span class="text-red-500">*</span>
                                 </span>
                             </label>
-                            <input type="text" name="no_plat" placeholder="B 1234 XYZ" 
-                                   class="w-full border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 px-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300" required>
+                            <input type="text" name="no_plat" placeholder="B 1234 XYZ"
+                                class="w-full border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 px-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300" required>
                         </div>
 
                         <!-- Merk -->
@@ -90,8 +100,8 @@ $nama_pemilik = $_SESSION['username']; // asumsi nama agen disimpan di session u
                                     Merk
                                 </span>
                             </label>
-                            <input type="text" name="merk" placeholder="Toyota, Honda, Suzuki..." 
-                                   class="w-full border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 px-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300">
+                            <input type="text" name="merk" placeholder="Toyota, Honda, Suzuki..."
+                                class="w-full border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 px-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300">
                         </div>
 
                         <!-- Tipe -->
@@ -104,8 +114,8 @@ $nama_pemilik = $_SESSION['username']; // asumsi nama agen disimpan di session u
                                     Tipe
                                 </span>
                             </label>
-                            <input type="text" name="tipe" placeholder="Avanza, Xenia, Ertiga..." 
-                                   class="w-full border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 px-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300">
+                            <input type="text" name="tipe" placeholder="Avanza, Xenia, Ertiga..."
+                                class="w-full border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 px-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300">
                         </div>
 
                         <!-- Tahun -->
@@ -118,8 +128,8 @@ $nama_pemilik = $_SESSION['username']; // asumsi nama agen disimpan di session u
                                     Tahun
                                 </span>
                             </label>
-                            <input type="number" name="tahun" min="1990" max="2099" placeholder="2023" 
-                                   class="w-full border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 px-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300">
+                            <input type="number" name="tahun" min="1990" max="2099" placeholder="2023"
+                                class="w-full border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 px-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300">
                         </div>
 
                         <!-- Harga Sewa -->
@@ -135,8 +145,8 @@ $nama_pemilik = $_SESSION['username']; // asumsi nama agen disimpan di session u
                             </label>
                             <div class="relative">
                                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">Rp</span>
-                                <input type="number" name="harga_sewa" step="0.01" placeholder="350000" 
-                                       class="w-full border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 pl-12 pr-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300" required>
+                                <input type="number" name="harga_sewa" step="0.01" placeholder="350000"
+                                    class="w-full border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 pl-12 pr-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300" required>
                             </div>
                         </div>
 
@@ -150,13 +160,39 @@ $nama_pemilik = $_SESSION['username']; // asumsi nama agen disimpan di session u
                                     Status
                                 </span>
                             </label>
-                            <select name="status" 
-                                    class="w-full border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 px-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300 bg-white cursor-pointer">
+                            <select name="status"
+                                class="w-full border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 px-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300 bg-white cursor-pointer">
                                 <option value="tersedia">✓ Tersedia</option>
                                 <option value="disewa">⊗ Disewa</option>
                                 <option value="perbaikan">🔧 Perbaikan</option>
                             </select>
                         </div>
+
+                        <!-- Lokasi -->
+                        <div class="group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 019.9 9.9l-4.95 4.95a1 1 0 01-1.414 0l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    Lokasi Kendaraan <span class="text-red-500">*</span>
+                                </span>
+                            </label>
+                            <select name="id_lokasi"
+                                class="w-full border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 px-4 py-3 rounded-xl transition-all duration-200 outline-none group-hover:border-gray-300 bg-white cursor-pointer"
+                                required>
+                                <option value="">-- Pilih Lokasi --</option>
+                                <?php foreach ($lokasi_data as $lok): ?>
+                                    <option value="<?= htmlspecialchars($lok['id_lokasi']) ?>">
+                                        <?= htmlspecialchars($lok['nama_lokasi']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <?php if (empty($lokasi_data)): ?>
+                                <p class="text-sm text-red-500 mt-2">Belum ada lokasi yang tersedia, hubungi admin!</p>
+                            <?php endif; ?>
+                        </div>
+
                     </div>
 
                     <!-- Image Upload Section -->
@@ -169,11 +205,11 @@ $nama_pemilik = $_SESSION['username']; // asumsi nama agen disimpan di session u
                                 Foto Kendaraan
                             </span>
                         </label>
-                        
+
                         <!-- Upload Area -->
                         <div class="relative border-3 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-emerald-400 transition-all duration-200 bg-gray-50 hover:bg-emerald-50 cursor-pointer" id="uploadArea">
                             <input type="file" name="gambar" id="gambarInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                            
+
                             <div id="uploadPlaceholder">
                                 <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
@@ -181,7 +217,7 @@ $nama_pemilik = $_SESSION['username']; // asumsi nama agen disimpan di session u
                                 <p class="text-gray-600 font-medium mb-1">Klik atau drag foto ke sini</p>
                                 <p class="text-sm text-gray-500">Format: JPG, PNG (Maks. 2MB)</p>
                             </div>
-                            
+
                             <!-- Preview Container -->
                             <div id="previewContainer" class="hidden">
                                 <img id="previewImage" src="" alt="Preview" class="max-w-full h-64 object-contain mx-auto rounded-lg shadow-md">
@@ -193,7 +229,7 @@ $nama_pemilik = $_SESSION['username']; // asumsi nama agen disimpan di session u
                                 </button>
                             </div>
                         </div>
-                        
+
                         <p id="fileError" class="text-red-500 text-sm mt-2 hidden flex items-center gap-2">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
@@ -203,8 +239,8 @@ $nama_pemilik = $_SESSION['username']; // asumsi nama agen disimpan di session u
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" 
-                            class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-3">
+                    <button type="submit"
+                        class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-3">
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                         </svg>
@@ -222,9 +258,25 @@ $nama_pemilik = $_SESSION['username']; // asumsi nama agen disimpan di session u
 
     <script>
         // GSAP Animations
-        gsap.to("#header", {duration: 0.8, opacity: 1, y: 0, ease: "power3.out"});
-        gsap.to("#formCard", {duration: 1, opacity: 1, y: 0, ease: "power3.out", delay: 0.2});
-        gsap.to("#footer", {duration: 0.8, opacity: 1, ease: "power3.out", delay: 0.4});
+        gsap.to("#header", {
+            duration: 0.8,
+            opacity: 1,
+            y: 0,
+            ease: "power3.out"
+        });
+        gsap.to("#formCard", {
+            duration: 1,
+            opacity: 1,
+            y: 0,
+            ease: "power3.out",
+            delay: 0.2
+        });
+        gsap.to("#footer", {
+            duration: 0.8,
+            opacity: 1,
+            ease: "power3.out",
+            delay: 0.4
+        });
 
         // Image Preview & Validation
         const gambarInput = document.getElementById("gambarInput");
@@ -297,4 +349,5 @@ $nama_pemilik = $_SESSION['username']; // asumsi nama agen disimpan di session u
         });
     </script>
 </body>
+
 </html>

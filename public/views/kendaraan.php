@@ -3,47 +3,84 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 include(__DIR__ . "/../../config/koneksi.php");
+
+
+// Batalkan pesanan pending lebih dari 15 menit
+$sql = "
+    UPDATE sewa s
+    JOIN kendaraan k ON s.id_kendaraan = k.id_kendaraan
+    SET 
+        s.status = 'ditolak',
+        k.status = 'tersedia'
+    WHERE 
+        s.status = 'menunggu_konfirmasi'
+        AND TIMESTAMPDIFF(MINUTE, s.dibuat_pada, NOW()) >= 15
+";
+
+mysqli_query($conn, $sql);
+
 session_start();
 
 // Role default
-$role = $_SESSION['role'] ?? 'guest'; // agen / pelanggan / guest
+$role = $_SESSION['role'] ?? 'guest';
 
-// Ambil filter status (default = all)
-$filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
+// Ambil filter
+$filter = $_GET['filter'] ?? 'all';
+$lokasi_filter = $_GET['lokasi'] ?? 'all';
+$harga_filter = $_GET['harga'] ?? 'default';
+
+// Escape input
 $filter_esc = mysqli_real_escape_string($conn, $filter);
+$lokasi_esc = mysqli_real_escape_string($conn, $lokasi_filter);
+$harga_esc = mysqli_real_escape_string($conn, $harga_filter);
 
-// Query utama kendaraan (join sewa + pelanggan biar bisa "Rented by")
-if ($filter_esc === 'all') {
-    $query = "SELECT k.*, p.nama_pemilik, pl.nama AS nama_penyewa 
-              FROM kendaraan k
-              JOIN pemilik p ON k.id_pemilik = p.id_pemilik
-              LEFT JOIN sewa s ON k.id_kendaraan = s.id_kendaraan AND s.status='aktif'
-              LEFT JOIN pelanggan pl ON s.id_pelanggan = pl.id_pelanggan
-              ORDER BY k.id_kendaraan DESC";
-} else {
-    $query = "SELECT k.*, p.nama_pemilik, pl.nama AS nama_penyewa 
-              FROM kendaraan k
-              JOIN pemilik p ON k.id_pemilik = p.id_pemilik
-              LEFT JOIN sewa s ON k.id_kendaraan = s.id_kendaraan AND s.status='aktif'
-              LEFT JOIN pelanggan pl ON s.id_pelanggan = pl.id_pelanggan
-              WHERE k.status = '$filter_esc'
-              ORDER BY k.id_kendaraan DESC";
+// Query utama kendaraan
+$query = "
+    SELECT k.*, p.nama_pemilik, pl.nama AS nama_penyewa, l.nama_lokasi
+    FROM kendaraan k
+    JOIN pemilik p ON k.id_pemilik = p.id_pemilik
+    LEFT JOIN sewa s ON k.id_kendaraan = s.id_kendaraan AND s.status='aktif'
+    LEFT JOIN pelanggan pl ON s.id_pelanggan = pl.id_pelanggan
+    LEFT JOIN lokasi l ON k.id_lokasi = l.id_lokasi
+    WHERE 1=1
+";
+
+// Filter status
+if ($filter_esc !== 'all') {
+    $query .= " AND k.status = '$filter_esc'";
 }
+
+// Filter lokasi
+if ($lokasi_esc !== 'all') {
+    $query .= " AND l.nama_lokasi = '$lokasi_esc'";
+}
+
+// Urutan harga
+if ($harga_esc === 'termurah') {
+    $query .= " ORDER BY k.harga_sewa ASC";
+} elseif ($harga_esc === 'termahal') {
+    $query .= " ORDER BY k.harga_sewa DESC";
+} else {
+    $query .= " ORDER BY k.id_kendaraan DESC";
+}
+
 $result = mysqli_query($conn, $query);
 
-// Hitung jumlah kendaraan sesuai filter
-if ($filter_esc === 'all') {
-    $count_sql = "SELECT COUNT(*) AS jumlah FROM kendaraan";
-} else {
-    $count_sql = "SELECT COUNT(*) AS jumlah FROM kendaraan WHERE status = '$filter_esc'";
-}
+// Hitung total kendaraan
+$count_sql = "
+    SELECT COUNT(*) AS jumlah 
+    FROM kendaraan k
+    LEFT JOIN lokasi l ON k.id_lokasi = l.id_lokasi
+    WHERE 1=1
+";
+
+if ($filter_esc !== 'all') $count_sql .= " AND k.status = '$filter_esc'";
+if ($lokasi_esc !== 'all') $count_sql .= " AND l.nama_lokasi = '$lokasi_esc'";
+
 $count_result = mysqli_query($conn, $count_sql);
-$total = 0;
-if ($count_result) {
-    $row_count = mysqli_fetch_assoc($count_result);
-    $total = isset($row_count['jumlah']) ? (int)$row_count['jumlah'] : 0;
-}
+$total = ($count_result) ? (int) mysqli_fetch_assoc($count_result)['jumlah'] : 0;
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -57,31 +94,34 @@ if ($count_result) {
         * {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
-        
+
         .filter-btn {
             transition: all 0.3s ease;
         }
-        
+
         .filter-btn:hover {
             transform: translateY(-2px);
         }
-        
+
         .vehicle-card {
             transition: all 0.3s ease;
         }
-        
+
         .vehicle-card:hover {
             transform: translateY(-8px);
         }
-        
+
         .badge-pulse {
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
-        
+
         @keyframes pulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 opacity: 1;
             }
+
             50% {
                 opacity: .8;
             }
@@ -96,7 +136,7 @@ if ($count_result) {
     <!-- Main -->
     <main class="min-h-screen pt-[80px]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            
+
             <!-- Hero Section -->
             <div class="text-center mb-12">
                 <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mb-4 shadow-lg">
@@ -129,6 +169,10 @@ if ($count_result) {
                             class="filter-btn px-6 py-3 rounded-xl font-semibold shadow-md <?= ($filter === 'perbaikan') ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'; ?>">
                             <i class="ri-tools-line mr-2"></i>Perbaikan
                         </a>
+                        <a href="?filter=pending"
+                            class="filter-btn px-6 py-3 rounded-xl font-semibold shadow-md <?= ($filter === 'pending') ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'; ?>">
+                            <i class="ri-hourglass-line mr-2"></i>Pending
+                        </a>
                     </div>
 
                     <!-- Tambah Kendaraan Button -->
@@ -139,6 +183,39 @@ if ($count_result) {
                             Tambah Kendaraan
                         </a>
                     <?php endif; ?>
+                </div>
+
+                <!-- Filter Harga -->
+                <div class="mt-4 flex flex-wrap gap-3">
+                    <a href="?filter=<?= $filter ?>&lokasi=<?= $lokasi_filter ?>&harga=default"
+                        class="filter-btn px-5 py-2.5 rounded-xl font-semibold shadow-md <?= ($harga_filter === 'default') ? 'bg-gradient-to-r from-gray-400 to-gray-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'; ?>">
+                        <i class="ri-arrow-up-down-line mr-1"></i>Urutan Default
+                    </a>
+                    <a href="?filter=<?= $filter ?>&lokasi=<?= $lokasi_filter ?>&harga=termurah"
+                        class="filter-btn px-5 py-2.5 rounded-xl font-semibold shadow-md <?= ($harga_filter === 'termurah') ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'; ?>">
+                        <i class="ri-sort-amount-down-line mr-1"></i>Termurah
+                    </a>
+                    <a href="?filter=<?= $filter ?>&lokasi=<?= $lokasi_filter ?>&harga=termahal"
+                        class="filter-btn px-5 py-2.5 rounded-xl font-semibold shadow-md <?= ($harga_filter === 'termahal') ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'; ?>">
+                        <i class="ri-sort-amount-up-line mr-1"></i>Termahal
+                    </a>
+                </div>
+
+                <!-- Filter Lokasi -->
+                <div class="flex flex-wrap gap-3 mt-4">
+                    <?php
+                    $lokasi_result = mysqli_query($conn, "SELECT * FROM lokasi");
+                    ?>
+                    <a href="?filter=<?= $filter ?>&lokasi=all"
+                        class="filter-btn px-5 py-2.5 rounded-xl font-semibold shadow-md <?= ($lokasi_filter === 'all') ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'; ?>">
+                        <i class="ri-map-pin-2-line mr-1"></i>Semua Lokasi
+                    </a>
+                    <?php while ($lok = mysqli_fetch_assoc($lokasi_result)): ?>
+                        <a href="?filter=<?= $filter ?>&lokasi=<?= urlencode($lok['nama_lokasi']) ?>"
+                            class="filter-btn px-5 py-2.5 rounded-xl font-semibold shadow-md <?= ($lokasi_filter === $lok['nama_lokasi']) ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'; ?>">
+                            <i class="ri-map-pin-line mr-1"></i><?= htmlspecialchars($lok['nama_lokasi']) ?>
+                        </a>
+                    <?php endwhile; ?>
                 </div>
 
                 <!-- Info Count -->
@@ -153,6 +230,8 @@ if ($count_result) {
                             <span><span class="font-bold text-red-600"><?= $total ?></span> kendaraan sedang dalam masa rental</span>
                         <?php elseif ($filter === 'perbaikan'): ?>
                             <span><span class="font-bold text-orange-600"><?= $total ?></span> kendaraan dalam proses maintenance</span>
+                        <?php elseif ($filter === 'pending'): ?>
+                            <span><span class="font-bold text-yellow-600"><?= $total ?></span> kendaraan sedang menunggu konfirmasi</span>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -184,9 +263,13 @@ if ($count_result) {
                                     <div class="absolute top-4 left-4 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg">
                                         <i class="ri-time-fill mr-1"></i>Disewa
                                     </div>
-                                <?php else: ?>
+                                <?php elseif ($row['status'] === 'perbaikan'): ?>
                                     <div class="absolute top-4 left-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg">
                                         <i class="ri-tools-fill mr-1"></i>Maintenance
+                                    </div>
+                                <?php elseif ($row['status'] === 'pending'): ?>
+                                    <div class="absolute top-4 left-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg badge-pulse">
+                                        <i class="ri-hourglass-fill mr-1"></i>Pending
                                     </div>
                                 <?php endif; ?>
 
@@ -205,13 +288,21 @@ if ($count_result) {
                                 </h3>
 
                                 <!-- Info -->
-                                <div class="flex items-center text-gray-600 text-sm mb-4">
-                                    <i class="ri-calendar-line mr-2"></i>
-                                    <span class="mr-4"><?= htmlspecialchars($row['tahun']) ?></span>
-                                    <i class="ri-profile-line mr-2"></i>
-                                    <span class="uppercase font-semibold"><?= htmlspecialchars($row['no_plat']) ?></span>
+                                <div class="flex text-gray-600 text-sm mb-4 flex-col">
+                                    <div class="">
+                                        <i class="ri-calendar-line mr-2"></i>
+                                        <span class="mr-4"><?= htmlspecialchars($row['tahun']) ?></span>
+                                        <i class="ri-profile-line mr-2"></i>
+                                        <span class="uppercase font-semibold"><?= htmlspecialchars($row['no_plat']) ?></span>
+                                    </div>
+                                    <div class="">
+                                        <i class="ri-map-pin-line text-purple-600 mr-2"></i>
+                                        <span class="text-gray-600">Lokasi:</span>
+                                        <span class="ml-2 font-semibold text-gray-800">
+                                            <?= htmlspecialchars($row['nama_lokasi'] ?? 'Tidak Diketahui') ?>
+                                        </span>
+                                    </div>
                                 </div>
-
                                 <!-- Owner Info -->
                                 <div class="bg-blue-50 rounded-xl p-3 mb-3">
                                     <div class="flex items-center text-sm">
@@ -222,7 +313,24 @@ if ($count_result) {
                                 </div>
 
                                 <!-- Renter Info -->
-                                <?php if ($row['status'] === 'disewa' && $row['nama_penyewa']): ?>
+                                <?php
+                                $canSeeRenter = false;
+
+                                // Cek apakah user adalah admin
+                                if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
+                                    $canSeeRenter = true;
+                                }
+                                // Cek apakah user adalah agen pemilik kendaraan
+                                elseif (
+                                    isset($_SESSION['role'], $_SESSION['id_pemilik']) &&
+                                    $_SESSION['role'] === 'agen' &&
+                                    $_SESSION['id_pemilik'] == $row['id_pemilik']
+                                ) {
+                                    $canSeeRenter = true;
+                                }
+
+                                if ($canSeeRenter && $row['status'] === 'disewa' && !empty($row['nama_penyewa'])):
+                                ?>
                                     <div class="bg-red-50 rounded-xl p-3 mb-4">
                                         <div class="flex items-center text-sm">
                                             <i class="ri-user-follow-line text-red-600 mr-2"></i>
@@ -287,16 +395,18 @@ if ($count_result) {
                             Tidak ada kendaraan yang sedang disewa
                         <?php elseif ($filter === 'perbaikan'): ?>
                             Tidak ada kendaraan dalam perbaikan
+                        <?php elseif ($filter === 'pending'): ?>
+                            Tidak ada kendaraan yang sedang menunggu konfirmasi
                         <?php endif; ?>
                     </p>
                     <?php if ($role === 'agen'): ?>
-                        <a href="tambah_kendaraan.php" 
+                        <a href="tambah_kendaraan.php"
                             class="inline-flex items-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200">
                             <i class="ri-add-circle-line text-xl mr-2"></i>
                             Tambah Kendaraan Pertama
                         </a>
                     <?php else: ?>
-                        <a href="?filter=all" 
+                        <a href="?filter=all"
                             class="inline-flex items-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200">
                             <i class="ri-refresh-line text-xl mr-2"></i>
                             Lihat Semua Kendaraan
